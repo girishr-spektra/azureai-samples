@@ -4,7 +4,7 @@ description: Uses a chat completions model to respond to queries grounded in rel
 model:
     api: chat
     configuration:
-        azure_deployment: gpt-5
+        azure_deployment: gpt-4.1
 inputs:
     conversation:
         type: array
