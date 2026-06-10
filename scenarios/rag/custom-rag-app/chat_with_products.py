@@ -4,9 +4,8 @@
 import os
 from pathlib import Path
 from opentelemetry import trace
-from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
-from config import ASSET_PATH, get_logger, enable_telemetry
+from config import ASSET_PATH, get_logger, enable_telemetry, get_openai_client
 from get_product_documents import get_product_documents
 
 
@@ -14,13 +13,8 @@ from get_product_documents import get_product_documents
 logger = get_logger(__name__)
 tracer = trace.get_tracer(__name__)
 
-# create a project client using environment variables loaded from the .env file
-project = AIProjectClient.from_connection_string(
-    conn_str=os.environ["AIPROJECT_CONNECTION_STRING"], credential=DefaultAzureCredential()
-)
-
-# create a chat client we can use for testing
-chat = project.inference.get_chat_completions_client()
+# create an Azure OpenAI client for chat completions
+openai_client = get_openai_client()
 # </imports_and_config>
 
 # <chat_function>
@@ -38,7 +32,7 @@ def chat_with_products(messages: list, context: dict = None) -> dict:
     grounded_chat_prompt = PromptTemplate.from_prompty(Path(ASSET_PATH) / "grounded_chat.prompty")
 
     system_message = grounded_chat_prompt.create_messages(documents=documents, context=context)
-    response = chat.complete(
+    response = openai_client.chat.completions.create(
         model=os.environ["CHAT_MODEL"],
         messages=system_message + messages,
         **grounded_chat_prompt.parameters,

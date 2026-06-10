@@ -1,7 +1,8 @@
-azure-ai-projects
+azure-ai-projects>=2.0.0
 azure-ai-inference[prompts]
 azure-identity
 azure-search-documents
 pandas
 python-dotenv
 opentelemetry-api
+openai

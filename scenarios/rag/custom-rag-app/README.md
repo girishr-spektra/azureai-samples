@@ -94,16 +94,23 @@ If you haven't already, you'll need to log in to the Azure CLI in your terminal.
 az login
 ```
 
-## Configure project string
+## Configure project endpoint
 
-Go back to the **Overview** page of your project, and in the upper right hand corner click the copy button beside the **Project connection string** field.
+Go back to the **Overview** page of your project, and copy the **Project endpoint** URL (format: `https://<resource-name>.services.ai.azure.com/api/projects/<project-name>`).
+
+Also, from the Azure portal, navigate to your **Azure AI Search** resource:
+ - Copy the **URL** from the Overview page
+ - Copy an **Admin key** from the Settings > Keys page
 
 Create a ```.env``` file using the sample:
 ```
 cp .env.sample .env
 ```
 
-Open the ```.env``` file and paste (ctrl-v) the value to the right of the ```AIPROJECT_CONNECTION_STRING=``` variable.
+Open the ```.env``` file and fill in:
+ - `FOUNDRY_PROJECT_ENDPOINT` — your project endpoint URL
+ - `AISEARCH_ENDPOINT` — your Azure AI Search URL
+ - `AISEARCH_API_KEY` — your Azure AI Search admin key
 
 
 ### Run the sample!

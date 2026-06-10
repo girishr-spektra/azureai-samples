@@ -3,10 +3,8 @@
 # <imports_and_config>
 import os
 import pandas as pd
-from azure.ai.projects import AIProjectClient
-from azure.ai.projects.models import ConnectionType
 from azure.ai.evaluation import evaluate, GroundednessEvaluator
-from azure.identity import DefaultAzureCredential
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
 from chat_with_products import chat_with_products
 
@@ -15,18 +13,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# create a project client using environment variables loaded from the .env file
-project = AIProjectClient.from_connection_string(
-    conn_str=os.environ["AIPROJECT_CONNECTION_STRING"], credential=DefaultAzureCredential()
-)
-
-connection = project.connections.get_default(connection_type=ConnectionType.AZURE_OPEN_AI, include_credentials=True)
+from config import AZURE_OPENAI_ENDPOINT, token_provider
 
 evaluator_model = {
-    "azure_endpoint": connection.endpoint_url,
+    "azure_endpoint": AZURE_OPENAI_ENDPOINT,
     "azure_deployment": os.environ["EVALUATION_MODEL"],
     "api_version": "2024-06-01",
-    "api_key": connection.key,
+    "azure_ad_token_provider": token_provider,
 }
 
 groundedness = GroundednessEvaluator(evaluator_model)
@@ -71,7 +64,7 @@ if __name__ == "__main__":
                 "context": {"${target.context}"},
             }
         },
-        azure_ai_project=project.scope,
+        azure_ai_project=os.environ["FOUNDRY_PROJECT_ENDPOINT"],
         output_path="./myevalresults.json",
     )
 

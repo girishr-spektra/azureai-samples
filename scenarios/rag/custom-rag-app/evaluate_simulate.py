@@ -8,25 +8,19 @@ from azure.ai.evaluation.simulator import Simulator
 from azure.ai.evaluation import evaluate, CoherenceEvaluator, FluencyEvaluator
 from typing import Any, Dict, List, Optional
 import asyncio
-from azure.ai.projects import AIProjectClient
-from azure.ai.projects.models import ConnectionType
-from azure.identity import DefaultAzureCredential
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-project = AIProjectClient.from_connection_string(
-    conn_str=os.environ["AIPROJECT_CONNECTION_STRING"], credential=DefaultAzureCredential()
-)
-
-connection = project.connections.get_default(connection_type=ConnectionType.AZURE_OPEN_AI, include_credentials=True)
+from config import AZURE_OPENAI_ENDPOINT, token_provider
 
 evaluator_model = {
-    "azure_endpoint": connection.endpoint_url,
+    "azure_endpoint": AZURE_OPENAI_ENDPOINT,
     "azure_deployment": os.environ["EVALUATION_MODEL"],
     "api_version": "2024-06-01",
-    "api_key": connection.key,
+    "azure_ad_token_provider": token_provider,
 }
 
 
