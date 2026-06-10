@@ -5,7 +5,7 @@ import sys
 import pathlib
 import logging
 from urllib.parse import urlparse
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from azure.identity import DefaultAzureCredential
 from openai import AzureOpenAI
 
 # load environment variables from the .env file
@@ -32,16 +32,15 @@ _parsed_url = urlparse(os.environ.get("FOUNDRY_PROJECT_ENDPOINT", ""))
 _resource_name = _parsed_url.hostname.split(".")[0] if _parsed_url.hostname else ""
 AZURE_OPENAI_ENDPOINT = f"https://{_resource_name}.openai.azure.com"
 
-# Shared credential and token provider for Entra ID authentication
+# Shared credential for Entra ID authentication (used for telemetry)
 credential = DefaultAzureCredential()
-token_provider = get_bearer_token_provider(credential, "https://cognitiveservices.azure.com/.default")
 
 
 def get_openai_client():
     """Get an authenticated AzureOpenAI client for chat completions and embeddings."""
     return AzureOpenAI(
         azure_endpoint=AZURE_OPENAI_ENDPOINT,
-        azure_ad_token_provider=token_provider,
+        api_key=os.environ["AZURE_OPENAI_API_KEY"],
         api_version="2024-10-21",
     )
 

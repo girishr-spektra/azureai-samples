@@ -8,19 +8,18 @@ from azure.ai.evaluation.simulator import Simulator
 from azure.ai.evaluation import evaluate, CoherenceEvaluator, FluencyEvaluator
 from typing import Any, Dict, List, Optional
 import asyncio
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-from config import AZURE_OPENAI_ENDPOINT, token_provider
+from config import AZURE_OPENAI_ENDPOINT
 
 evaluator_model = {
     "azure_endpoint": AZURE_OPENAI_ENDPOINT,
     "azure_deployment": os.environ["EVALUATION_MODEL"],
     "api_version": "2024-06-01",
-    "azure_ad_token_provider": token_provider,
+    "api_key": os.environ["AZURE_OPENAI_API_KEY"],
 }
 
 
