@@ -67,7 +67,7 @@ In this challenge, you will run an **evaluation script** to measure the performa
 1. Install the evaluation package by running:
 
    ```
-   pip install azure-ai-evaluation[remote]
+   pip install azure-ai-evaluation
    ```
 
 > **Note:** Installation may take several minutes.

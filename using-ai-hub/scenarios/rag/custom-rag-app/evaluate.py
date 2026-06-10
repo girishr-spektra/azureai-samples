@@ -3,10 +3,7 @@
 # <imports_and_config>
 import os
 import pandas as pd
-from azure.ai.projects import AIProjectClient
-from azure.ai.projects.models import ConnectionType
 from azure.ai.evaluation import evaluate, GroundednessEvaluator
-from azure.identity import DefaultAzureCredential
 
 from chat_with_products import chat_with_products
 
@@ -15,18 +12,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# create a project client using environment variables loaded from the .env file
-project = AIProjectClient.from_connection_string(
-    conn_str=os.environ["AIPROJECT_CONNECTION_STRING"], credential=DefaultAzureCredential()
-)
-
-connection = project.connections.get_default(connection_type=ConnectionType.AZURE_OPEN_AI, include_credentials=True)
+from config import AZURE_OPENAI_ENDPOINT
 
 evaluator_model = {
-    "azure_endpoint": connection.endpoint_url,
+    "azure_endpoint": AZURE_OPENAI_ENDPOINT,
     "azure_deployment": os.environ["EVALUATION_MODEL"],
     "api_version": "2024-06-01",
-    "api_key": connection.key,
+    "api_key": os.environ["AZURE_OPENAI_API_KEY"],
 }
 
 groundedness = GroundednessEvaluator(evaluator_model)
@@ -52,14 +44,34 @@ if __name__ == "__main__":
     from pathlib import Path
     import multiprocessing
     import contextlib
+    import json
 
     with contextlib.suppress(RuntimeError):
         multiprocessing.set_start_method("spawn", force=True)
 
-    # run evaluation with a dataset and target function, log to the project
+    # Pre-run target function on evaluation data to avoid batch engine compatibility issues
+    eval_data_path = Path(ASSET_PATH) / "chat_eval_data.jsonl"
+    precomputed_path = Path("./precomputed_eval_data.jsonl")
+
+    print("Running target function on evaluation data...")
+    with open(eval_data_path, "r") as f_in, open(precomputed_path, "w") as f_out:
+        for line in f_in:
+            row = json.loads(line.strip())
+            query = row["query"]
+            try:
+                result = evaluate_chat_with_products(query)
+                row["response"] = result["response"]
+                row["context"] = result["context"]
+            except Exception as e:
+                print(f"  Warning: failed for query '{query}': {e}")
+                row["response"] = ""
+                row["context"] = ""
+            f_out.write(json.dumps(row) + "\n")
+    print("Target function completed. Running evaluators...")
+
+    # run evaluation with pre-computed data (no target function needed)
     result = evaluate(
-        data=Path(ASSET_PATH) / "chat_eval_data.jsonl",
-        target=evaluate_chat_with_products,
+        data=str(precomputed_path),
         evaluation_name="evaluate_chat_with_products",
         evaluators={
             "groundedness": groundedness,
@@ -67,11 +79,11 @@ if __name__ == "__main__":
         evaluator_config={
             "default": {
                 "query": {"${data.query}"},
-                "response": {"${target.response}"},
-                "context": {"${target.context}"},
+                "response": {"${data.response}"},
+                "context": {"${data.context}"},
             }
         },
-        azure_ai_project=project.scope,
+        azure_ai_project=os.environ["FOUNDRY_PROJECT_ENDPOINT"],
         output_path="./myevalresults.json",
     )
 

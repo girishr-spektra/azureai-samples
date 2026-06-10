@@ -2,34 +2,21 @@
 
 # <imports_and_config>
 import os
-from azure.ai.projects import AIProjectClient
-from azure.ai.projects.models import ConnectionType
-from azure.identity import DefaultAzureCredential
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents import SearchClient
 from azure.search.documents.indexes import SearchIndexClient
-from config import get_logger
+from config import get_logger, get_openai_client
 
 # initialize logging object
 logger = get_logger(__name__)
 
-# create a project client using environment variables loaded from the .env file
-project = AIProjectClient.from_connection_string(
-    conn_str=os.environ["AIPROJECT_CONNECTION_STRING"], credential=DefaultAzureCredential()
-)
+# create an OpenAI client for embeddings
+openai_client = get_openai_client()
 
-# create a vector embeddings client that will be used to generate vector embeddings
-embeddings = project.inference.get_embeddings_client()
-
-# use the project client to get the default search connection
-search_connection = project.connections.get_default(
-    connection_type=ConnectionType.AZURE_AI_SEARCH, include_credentials=True
-)
-
-# Create a search index client using the search connection
-# This client will be used to create and delete search indexes
+# Create a search index client using environment variables
 index_client = SearchIndexClient(
-    endpoint=search_connection.endpoint_url, credential=AzureKeyCredential(key=search_connection.key)
+    endpoint=os.environ["AISEARCH_ENDPOINT"],
+    credential=AzureKeyCredential(key=os.environ["AISEARCH_API_KEY"]),
 )
 # </imports_and_config>
 
@@ -148,7 +135,7 @@ def create_docs_from_csv(path: str, content_column: str, model: str) -> list[dic
         id = str(product["id"])
         title = product["name"]
         url = f"/products/{title.lower().replace(' ', '-')}"
-        emb = embeddings.embed(input=content, model=model)
+        emb = openai_client.embeddings.create(input=content, model=model)
         rec = {
             "id": id,
             "content": content,
@@ -180,9 +167,9 @@ def create_index_from_csv(index_name, csv_file):
 
     # Add the documents to the index using the Azure AI Search client
     search_client = SearchClient(
-        endpoint=search_connection.endpoint_url,
+        endpoint=os.environ["AISEARCH_ENDPOINT"],
         index_name=index_name,
-        credential=AzureKeyCredential(key=search_connection.key),
+        credential=AzureKeyCredential(key=os.environ["AISEARCH_API_KEY"]),
     )
 
     search_client.upload_documents(docs)

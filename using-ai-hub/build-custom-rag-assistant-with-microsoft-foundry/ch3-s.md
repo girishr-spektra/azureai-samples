@@ -53,23 +53,15 @@ This setup will allow the local application to securely communicate with Azure A
    pip install -r requirements.txt
    ```
 
-1. Install the Microsoft Foundry SDK packages:
-
-   ```
-   pip install azure-ai-projects==1.0.0b5
-   ```
-
-1. Install the inference SDK:
-
-   ```
-   pip install azure-ai-inference==1.0.0b8
-   ```
-
     > **Note:** Installation may take several minutes depending on the environment.
  
 ### Configure Environment Variables
 
-1. Navigate back to the **Microsoft Foundry portal**. Open your **project** and get the **Project connection string**.
+1. Navigate back to the **Microsoft Foundry portal**. Open your **project** and copy the **Project Endpoint** from the Overview page (it looks like `https://<resource-name>.services.ai.azure.com/api/projects/<project-name>`).
+
+1. From **Management Center** > **Connected Resources**, click on the **Azure OpenAI** connection and copy the **API Key**.
+
+1. From the **Azure AI Search** resource in the Azure Portal, copy the **URL** and one of the **Admin Keys**.
 
 1. Return to **Visual Studio Code**.
 
@@ -81,14 +73,19 @@ This setup will allow the local application to securely communicate with Azure A
 
    `.env`
 
-1. Replace the placeholder value `your_connection_string` with the **Project connection string** in the `.env` file.
+1. Fill in the following values in the `.env` file:
+
+   - `FOUNDRY_PROJECT_ENDPOINT` — The Project Endpoint from Foundry.
+   - `AZURE_OPENAI_API_KEY` — The API Key from the Azure OpenAI connection.
+   - `AISEARCH_ENDPOINT` — The AI Search URL.
+   - `AISEARCH_API_KEY` — The Admin Key from Azure AI Search.
 
 ## Success Criteria
 
 - GitHub repository cloned successfully  
 - Project opened in Visual Studio Code  
 - Required Python dependencies installed successfully  
-- `.env` file configured with the Foundry project connection string  
+- `.env` file configured with the Foundry project endpoint, API keys, and AI Search credentials  
 
 ## Additional Resources
 

@@ -67,18 +67,6 @@ This setup will allow the local application to securely communicate with Azure A
    pip install -r requirements.txt
    ```
 
-1. Install the Microsoft Foundry SDK packages:
-
-   ```
-   pip install azure-ai-projects==1.0.0b5
-   ```
-
-1. Install the inference SDK:
-
-   ```
-   pip install azure-ai-inference==1.0.0b8
-   ```
-
     > **Note:** Installation may take several minutes depending on the environment.
  
 ### Configure Environment Variables
@@ -89,7 +77,11 @@ This setup will allow the local application to securely communicate with Azure A
 
 1. From the left navigation pane, select **Overview**.
 
-1. Scroll down and copy the **Project connection string**.
+1. Scroll down and copy the **Project Endpoint** (it looks like `https://<resource-name>.services.ai.azure.com/api/projects/<project-name>`).
+
+1. From the left navigation pane, select **Management Center** > **Connected Resources**. Click on the **Azure OpenAI** connection and copy the **API Key**.
+
+1. Navigate to the **Azure AI Search** resource in the Azure Portal. Copy the **URL** from the Overview page and one of the **Admin Keys** from the Keys section.
 
 1. Return to **Visual Studio Code**.
 
@@ -105,9 +97,14 @@ This setup will allow the local application to securely communicate with Azure A
 
 1. Open the **.env** file.
 
-1. Replace the placeholder value `your_connection_string` with the **Project connection string** you copied from Foundry.
+1. Fill in the following values:
 
-   > **Important**: Paste the connection string inside the quotation marks (" ").
+   - `FOUNDRY_PROJECT_ENDPOINT` — Paste the **Project Endpoint** you copied from Foundry.
+   - `AZURE_OPENAI_API_KEY` — Paste the **API Key** from the Azure OpenAI connection.
+   - `AISEARCH_ENDPOINT` — Paste the **AI Search URL** (e.g., `https://aisearch-xxxxx.search.windows.net`).
+   - `AISEARCH_API_KEY` — Paste the **Admin Key** from Azure AI Search.
+
+   > **Important**: Paste each value inside the quotation marks (" ").
 
 1. Press **Ctrl + S** to save the file.
 
@@ -116,7 +113,7 @@ This setup will allow the local application to securely communicate with Azure A
 - GitHub repository cloned successfully  
 - Project opened in Visual Studio Code  
 - Required Python dependencies installed successfully  
-- `.env` file configured with the Foundry project connection string  
+- `.env` file configured with the Foundry project endpoint, API keys, and AI Search credentials  
 
 ## Additional Resources
 

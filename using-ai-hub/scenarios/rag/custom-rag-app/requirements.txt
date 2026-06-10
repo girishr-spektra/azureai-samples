@@ -1,7 +1,8 @@
-azure-ai-projects
-azure-ai-inference[prompts]
-azure-identity
-azure-search-documents
-pandas
-python-dotenv
-opentelemetry-api
+azure-ai-projects==2.2.0
+azure-ai-evaluation==1.17.0
+azure-identity==1.25.3
+azure-search-documents==12.0.0
+pandas==2.3.3
+python-dotenv==1.2.2
+opentelemetry-api==1.40.0
+openai==2.20.0

@@ -4,9 +4,7 @@
 import os
 from pathlib import Path
 from opentelemetry import trace
-from azure.ai.projects import AIProjectClient
-from azure.identity import DefaultAzureCredential
-from config import ASSET_PATH, get_logger, enable_telemetry
+from config import ASSET_PATH, get_logger, enable_telemetry, get_openai_client
 from get_product_documents import get_product_documents
 
 
@@ -14,17 +12,11 @@ from get_product_documents import get_product_documents
 logger = get_logger(__name__)
 tracer = trace.get_tracer(__name__)
 
-# create a project client using environment variables loaded from the .env file
-project = AIProjectClient.from_connection_string(
-    conn_str=os.environ["AIPROJECT_CONNECTION_STRING"], credential=DefaultAzureCredential()
-)
-
-# create a chat client we can use for testing
-chat = project.inference.get_chat_completions_client()
+# create an OpenAI client for chat completions
+openai_client = get_openai_client()
 # </imports_and_config>
 
 # <chat_function>
-from azure.ai.inference.prompts import PromptTemplate
 
 
 @tracer.start_as_current_span(name="chat_with_products")
@@ -35,13 +27,25 @@ def chat_with_products(messages: list, context: dict = None) -> dict:
     documents = get_product_documents(messages, context)
 
     # do a grounded chat call using the search results
-    grounded_chat_prompt = PromptTemplate.from_prompty(Path(ASSET_PATH) / "grounded_chat.prompty")
+    grounded_chat_prompt_file = Path(ASSET_PATH) / "grounded_chat.prompty"
+    with open(grounded_chat_prompt_file, "r") as f:
+        prompty_content = f.read()
 
-    system_message = grounded_chat_prompt.create_messages(documents=documents, context=context)
-    response = chat.complete(
+    # Build system message from documents
+    system_message = (
+        "You are an AI assistant helping users with questions about outdoor products. "
+        "Use the following context to answer the user's question. "
+        "If you cannot answer based on the context, say so.\n\n"
+        f"Context:\n{documents}"
+    )
+
+    all_messages = [{"role": "system", "content": system_message}] + messages
+
+    response = openai_client.chat.completions.create(
         model=os.environ["CHAT_MODEL"],
-        messages=system_message + messages,
-        **grounded_chat_prompt.parameters,
+        messages=all_messages,
+        temperature=0.7,
+        max_tokens=800,
     )
     logger.info(f"💬 Response: {response.choices[0].message}")
 

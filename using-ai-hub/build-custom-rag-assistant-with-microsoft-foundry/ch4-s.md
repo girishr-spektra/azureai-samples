@@ -32,7 +32,7 @@ In this challenge, you will run a script that **creates an Azure AI Search index
 
 1. No code modifications are required for this script.
 
-### Authenticate with Azure
+### Run the Indexing Script
 
 1. Open the **VS Code integrated terminal**.
 
@@ -40,13 +40,7 @@ In this challenge, you will run a script that **creates an Azure AI Search index
 
    `rag/custom-rag-app`
 
-1. Sign in to Azure by running the following command:
-   
-   ```
-   az login
-   ```
-
-1. A browser window will open. Sign in using the lab credentials provided as **Work or School** account.
+1. Run the following command to build the search index and upload the dataset:
 
 1. Once authentication completes, return to the terminal.
 

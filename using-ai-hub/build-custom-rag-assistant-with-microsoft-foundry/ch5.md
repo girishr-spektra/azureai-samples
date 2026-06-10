@@ -79,6 +79,16 @@ In this challenge, you will test the **RAG chat application**, generate response
 
 ### Enable Telemetry Logging
 
+1. First, sign in to Azure (required for telemetry to authenticate with Application Insights):
+
+   ```
+   az login
+   ```
+
+1. A browser window will open. Sign in using the lab credentials provided. Select **Work or School** account and use the environment-provided credentials.
+
+1. Once authentication completes, return to the terminal and press **Enter** to select the default subscription if prompted.
+
 1. Run the RAG chat application again with telemetry enabled:
 
    ```
