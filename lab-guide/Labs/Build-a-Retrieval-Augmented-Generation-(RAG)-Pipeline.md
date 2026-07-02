@@ -23,6 +23,9 @@ In this exercise, you will complete the following tasks:
 
 In this task, you will index knowledge sources by processing and storing vectorized data from a CSV file using a search index. You will also authenticate your Azure account, execute the indexing script, and register the index to your cloud project.
 
+> [!NOTE]
+> The sample scripts use the new **Microsoft Foundry SDK** (`azure-ai-projects` 2.x). They authenticate to your project with the `PROJECT_ENDPOINT` value you configured in the `.env` file, so no code changes are required.
+
 1. In the Visual Studio Code, expand the **assets (1)** folder and select **products.csv** file **(2)**. Review the file. It contains example datasets used in your chat application.
 
     ![](../media/af35.png)

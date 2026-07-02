@@ -8,7 +8,7 @@ You are an AI developer at a company building an internal knowledge assistant. B
 
 ## 📖 Overview
 
-In this exercise, you will prepare an end-to-end environment for a **Retrieval-Augmented Generation (RAG)** application using **Microsoft Foundry**. You will provision an AI Foundry project and hub, deploy an OpenAI chat model and an embedding model, create and connect an Azure AI Search service, clone the sample repository, and configure local environment variables so the sample RAG app can run locally.
+In this exercise, you will prepare an end-to-end environment for a **Retrieval-Augmented Generation (RAG)** application using **Microsoft Foundry**. You will provision a Microsoft Foundry project in the new portal, deploy an OpenAI chat model and an embedding model, create and connect an Azure AI Search service, clone the sample repository, and configure local environment variables so the sample RAG app can run locally.
 
 By the end of the exercise, you will have a functional foundation for building and testing a custom RAG pipeline that retrieves relevant knowledge and augments model-generated responses.
 
@@ -23,48 +23,39 @@ In this exercise, you will complete the following task:
 - Task 5: Clone the GitHub repository for the project.
 - Task 6: Configure environment variables.
 
-### Task 1: Set Up Microsoft Foundry and create a Project
+### Task 1: Create a Microsoft Foundry Project
 
-In this task, you will create a new project in Microsoft Foundry and configure the required resources.
+In this task, you will create a project in the new **Microsoft Foundry** portal. The new portal uses a hub-less **Foundry project** that provisions a Microsoft Foundry resource for you, so you no longer create a separate AI Hub.
 
-1. Navigate to the home page of **Azure Portal**.
+> [!NOTE]
+> The screenshots for the new Microsoft Foundry portal are placeholders. Capture each screen as you complete the step, and confirm that the on-screen labels match the instruction before continuing.
 
-1. On the home page, search for **Microsoft Foundry (1)** in the Search bar and select **Microsoft Foundry (2)**.
+1. On your virtual machine, open a new browser tab, enter **https://ai.azure.com** in the address bar, and then open the **Microsoft Foundry** portal.
 
-    ![](../media/E1T1S2-2111.png) 
+    ![To be captured](../media/foundry-new-portal-home.png)
 
-1. In the Microsoft Foundry home page, click on select **AI Hubs (1)** under **Use with Foundry**. Click on **+ Create (2)** and select **Hub (3)**. 
+1. On the **Microsoft Foundry** home page, select **Create new**, and then select **Project**.
 
-    ![](../media/E1T1S3-2111.png)    
+    ![To be captured](../media/foundry-new-create-project.png)
 
-1. On the Azure AI Hub creation page, enter the following details and then click on **Review + Create (5)**:
+1. On the **Create a project** page, enter the following details, and then select **Create**:
 
-    - Subscription: Select Default Subscription **(1)**
-    - Resource group : **ragsdk-<inject key="DeploymentID" enableCopy="false"/> (2)**
-    - Region : **<inject key="Region" enableCopy="false"/> (3)**
-    - Name : **ContosoHub (4)**
+    - Project name: **ContosoTrek (1)**
+    - Resource group: **ragsdk-<inject key="DeploymentID" enableCopy="false"/> (2)**
+    - Region: **<inject key="Region" enableCopy="false"/> (3)**
 
-      ![](../media/E1T1S4-2310.png)
+      ![To be captured](../media/foundry-new-project-details.png)
 
-1. Then click on **Create**.
+1. Wait for the project to be created, and then verify that the project **Overview** page opens.
 
-   ![](../media/azure-ai-hub-create.png)
+    ![To be captured](../media/foundry-new-project-overview.png)
 
-1. After deployment is successful, click on **Go to resource**.      
+1. On the project **Overview** page, copy the **Project endpoint**, and then paste it into a notepad. You will use it to configure the environment variables in Task 6.
 
-      ![](../media/s1.png)
+    > [!NOTE]
+    > The project endpoint uses the format `https://<resource-name>.ai.azure.com/api/projects/ContosoTrek`.
 
-1. On the **ContosoHub** page click on **Launch Azure AI Foundry**.
-
-    ![](../media/E1T1S7-2310.png)
-
-1. From the left navigation pane, select **Overview (1)**, scroll down and click on **+ New Project (2)**. 
-
-    ![](../media/E1T1S8-2111.png)
-
-1. Now Enter Project name as **ContosoTrek (1)** and click on **Create (2)**
-
-    ![](../media/E1T1S9-2111.png)
+    ![To be captured](../media/foundry-new-project-endpoint.png)
 
    > **Congratulations** on completing the task! Now, it's time to validate it. Here are the steps:    
    - Hit the validate button for the corresponding task. If you receive a success message, you can proceed to the next task.
@@ -230,28 +221,17 @@ In this task, you will clone the GitHub repository for the project to access the
 
     ![](../media/af28.png)
 
-1. Install the required Azure SDK packages:
+1. Install the required Microsoft Foundry SDK packages:
 
     ```
-    pip install azure-ai-projects==1.0.0b5  
+    pip install azure-ai-projects>=2.0.0
     ```
-   ```
-   pip install azure-ai-inference==1.0.0b8
-   ```
-    
-   >**Note:** Wait for the installation to complete. It might take some time.
+
+   > **Note:** Version 2.x uses the new **Foundry projects** API and is not compatible with the 1.x SDK. Wait for the installation to complete. It might take some time.
 
 ### Task 6: Configure Environment Variables
 
-In this task, you will set up and configure the necessary environment variables to ensure seamless integration between your RAG application and Microsoft Foundry services.
-
-1. Navigate back to the **Microsoft Foundry** portal. In **Microsoft Foundry | Management center**, click on **Go to project**.
-
-    ![](../media/E1T6S1-2111.png)
-
-1. Navigate to **Overview (1)**, scroll down then copy and paste the **Project connection string (2)** into a notepad. You will be using it in the next step.
-
-    ![](../media/E1T6S2-2111.png)
+In this task, you will configure the environment variables that connect your RAG application to your Microsoft Foundry project using the project endpoint.
 
 1. Navigate back to the **Visual Studio Code**.
 
@@ -261,11 +241,12 @@ In this task, you will set up and configure the necessary environment variables 
 
 1. Rename the file to `.env`.
 
-1. Click on the `.env` **(1)** file and replace **your_connection_string (2)** with the **Project connection string** you copied in **Task 6 > Step 2** and ensure that the **CHAT_MODEL**, **EVALUATION_MODEL** and **INTENT_MAPPING_MODEL** values are mapped with **gpt-4.1-mini**.
+1. Select the `.env` **(1)** file and replace **your_project_endpoint (2)** with the **Project endpoint** you copied in **Task 1**, and then ensure that the **CHAT_MODEL**, **EVALUATION_MODEL**, and **INTENT_MAPPING_MODEL** values are set to **gpt-4.1-mini**.
 
-    ![](../media/rgv6.png)
+    ![To be captured](../media/dot-env-project-endpoint.png)
 
-    ![](../media/dot-env-values.png)
+    > [!NOTE]
+    > The sample uses the `PROJECT_ENDPOINT` environment variable with the new Microsoft Foundry SDK. The connection string used by the classic hub-based SDK is no longer required.
 
 1. Press **Ctrl+S** to save the file.
 
@@ -273,12 +254,12 @@ In this task, you will set up and configure the necessary environment variables 
 
 In this exercise, you have successfully:
 
-- Created an AI Hub and a project in the Microsoft Foundry portal.
+- Created a hub-less project in the new Microsoft Foundry portal and copied its project endpoint.
 - Deployed the gpt-4.1-mini model for chat-based interactions and the text-embedding-ada-002 model for generating embeddings.
 - Provisioned an Azure AI Search service in Microsoft Azure.
 - Connected the Azure AI Search service to your project to enable retrieval capabilities.
 - Cloned the GitHub repository to access the required code and resources for building the chat application.
-- Configured the necessary environment variables in the `.env` file to integrate your application with Azure services and deployed models.
+- Configured the necessary environment variables in the `.env` file to integrate your application with the Microsoft Foundry project and deployed models.
 
 ### You have successfully completed the exercise. Click **Next >>** to continue to the next exercise.
 

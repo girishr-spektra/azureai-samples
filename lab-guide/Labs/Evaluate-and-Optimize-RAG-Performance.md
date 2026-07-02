@@ -1,22 +1,26 @@
-# Exercise 03: Evaluate and Optimize RAG Performance
+# Exercise 03: Evaluate and Optimize RAG Performance with ASSERT
 
 ### Estimated Duration: 1 Hour
 
 ## 📘 Scenario
 
-After deploying the RAG chatbot, stakeholders report that some answers are incomplete or not fully aligned with the retrieved content. You must evaluate the RAG system using Azure AI evaluators to measure retrieval accuracy and response quality. Based on the evaluation results, you will fine-tune retrieval settings and prompting to improve the assistant’s reliability and efficiency.
+After deploying the RAG chatbot, stakeholders report that some answers are incomplete or drift from the retrieved content and from company policy. Instead of manually inspecting prompts and eyeballing responses, you will evaluate the assistant with **ASSERT** (Adaptive Spec-driven Scoring for Evaluation and Regression Testing), Microsoft's open-source, policy-driven evaluation framework. You will describe the behaviors you expect in a specification, let ASSERT generate targeted test cases, run them against your RAG app, and use the scored results to improve the assistant and confirm the improvement.
 
 ## 📖 Overview
 
-In this exercise, you will evaluate the performance of your RAG pipeline using Azure AI evaluators, implement various evaluation methods, and interpret the results to fine-tune your model. This ensures improved retrieval accuracy, response quality, and overall system efficiency.
+In this exercise, you will use **ASSERT** to evaluate your RAG pipeline. You will install ASSERT, define an evaluation specification that captures your grounding and safety requirements, wrap the RAG app as an evaluation target, run ASSERT to generate and score test cases, review the scored artifacts in the ASSERT local viewer, apply an improvement, and re-run ASSERT to validate the change.
+
+> [!NOTE]
+> ASSERT is an open-source, local-first framework. It runs from the terminal, writes inspectable JSON/JSONL artifacts locally, and uses an LLM judge to score each conversation against your specification. The screenshots in this exercise are placeholders — capture the terminal output and viewer screens as you complete each step.
 
 ## 🎯 Objectives
 
 In this exercise, you will complete the following tasks:
 
-- Task 1: Evaluate with Azure AI evaluators
-- Task 2: Implementing Evaluation Methods
-- Task 3: Interpreting Results and Fine-Tuning 
+- Task 1: Install and configure ASSERT
+- Task 2: Define an evaluation specification and target
+- Task 3: Run ASSERT and interpret the results
+- Task 4: Apply an improvement and re-run ASSERT
 
 ## Task 1: Evaluate with Azure AI Evaluators
 
