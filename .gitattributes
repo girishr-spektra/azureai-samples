@@ -1,2 +1,16 @@
 # Force git to checkout text files with LF (line feed) as the ending (vs CRLF)
 * text=auto eol=lf
+
+# Treat binary/image assets as binary so Git never applies EOL normalization to them
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.bmp binary
+*.ico binary
+*.svg binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.ipynb binary
