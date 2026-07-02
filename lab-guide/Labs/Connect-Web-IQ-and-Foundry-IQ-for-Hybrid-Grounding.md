@@ -25,7 +25,7 @@ In this module, you will complete the following tasks:
 ## Prerequisites
 
 - A completed RAG app with an enterprise search index from the previous modules.
-- Your Microsoft Foundry **Project endpoint** and deployed **gpt-4.1-mini** model.
+- Your Microsoft Foundry **Project endpoint** and deployed **gpt-5.4-mini** model.
 - An **Azure AI Search** service with agentic retrieval enabled.
 - **Web IQ** access enabled for your Azure subscription.
 
@@ -83,7 +83,7 @@ In this task, you will create a Foundry IQ knowledge base that retrieves from bo
 1. Enter the following details:
 
    - Name: **contoso-hybrid-knowledge (1)**
-   - Model: **gpt-4.1-mini (2)**
+   - Model: **gpt-5.4-mini (2)**
 
    ![To be captured](../media/foundryiq-create-knowledge-base.png)
 

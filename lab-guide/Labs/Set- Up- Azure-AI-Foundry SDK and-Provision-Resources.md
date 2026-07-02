@@ -25,37 +25,49 @@ In this exercise, you will complete the following task:
 
 ### Task 1: Create a Microsoft Foundry Project
 
-In this task, you will create a project in the new **Microsoft Foundry** portal. The new portal uses a hub-less **Foundry project** that provisions a Microsoft Foundry resource for you, so you no longer create a separate AI Hub.
+In this task, you will create a **Microsoft Foundry** resource and project directly from the **Azure portal**. Creating the resource with project management enabled provisions a hub-less Foundry project, so you no longer create a separate AI Hub.
 
 > [!NOTE]
-> The screenshots for the new Microsoft Foundry portal are placeholders. Capture each screen as you complete the step, and confirm that the on-screen labels match the instruction before continuing.
+> The screenshots are placeholders. During the ongoing rename, the resource may still appear as **Azure AI Foundry** on some Azure portal screens. Capture each screen as you complete the step, and confirm that the on-screen labels match the instruction before continuing.
 
-1. On your virtual machine, open a new browser tab, enter **https://ai.azure.com** in the address bar, and then open the **Microsoft Foundry** portal.
+1. On your virtual machine, open the **Azure portal**.
 
-    ![To be captured](../media/foundry-new-portal-home.png)
+1. In the search bar, enter **Microsoft Foundry (1)**, and then select **Microsoft Foundry (2)** from the results.
 
-1. On the **Microsoft Foundry** home page, select **Create new**, and then select **Project**.
+    ![To be captured](../media/foundry-portal-search.png)
 
-    ![To be captured](../media/foundry-new-create-project.png)
+1. On the **Microsoft Foundry** page, select **+ Create**.
 
-1. On the **Create a project** page, enter the following details, and then select **Create**:
+    ![To be captured](../media/foundry-portal-create.png)
 
-    - Project name: **ContosoTrek (1)**
+1. On the **Create a Microsoft Foundry resource** page, enter the following details, and then select **Review + create (6)**:
+
+    - Subscription: Select the default subscription **(1)**
     - Resource group: **ragsdk-<inject key="DeploymentID" enableCopy="false"/> (2)**
     - Region: **<inject key="Region" enableCopy="false"/> (3)**
+    - Name: **ContosoFoundry (4)**
+    - Project name: **ContosoTrek (5)**
 
-      ![To be captured](../media/foundry-new-project-details.png)
+      ![To be captured](../media/foundry-portal-create-details.png)
 
-1. Wait for the project to be created, and then verify that the project **Overview** page opens.
+1. Review the configuration settings, and then select **Create**.
 
-    ![To be captured](../media/foundry-new-project-overview.png)
+    ![To be captured](../media/foundry-portal-review-create.png)
+
+1. Wait for the deployment to complete, and then select **Go to resource**.
+
+    ![To be captured](../media/foundry-portal-go-to-resource.png)
+
+1. On the resource **Overview** page, select **Go to Microsoft Foundry portal** to open your **ContosoTrek** project.
+
+    ![To be captured](../media/foundry-portal-launch.png)
 
 1. On the project **Overview** page, copy the **Project endpoint**, and then paste it into a notepad. You will use it to configure the environment variables in Task 6.
 
     > [!NOTE]
     > The project endpoint uses the format `https://<resource-name>.ai.azure.com/api/projects/ContosoTrek`.
 
-    ![To be captured](../media/foundry-new-project-endpoint.png)
+    ![To be captured](../media/foundry-project-endpoint.png)
 
    > **Congratulations** on completing the task! Now, it's time to validate it. Here are the steps:    
    - Hit the validate button for the corresponding task. If you receive a success message, you can proceed to the next task.
@@ -66,11 +78,11 @@ In this task, you will create a project in the new **Microsoft Foundry** portal.
 
 ### Task 2: Deploying and Managing AI Models 
 
-In this task, you will deploy models in your Microsoft Foundry project. You need two models to build a RAG-based chat app: an Azure OpenAI chat model (gpt-4.1-mini) and an Azure OpenAI embedding model (text-embedding-ada-002).
+In this task, you will deploy models in your Microsoft Foundry project. You need two models to build a RAG-based chat app: an Azure OpenAI chat model (gpt-5.4-mini) and an Azure OpenAI embedding model (text-embedding-ada-002).
 
-1. On the Microsoft Foundry portal from the left navigation pane, select **Model catalog (1)**. Scroll down and search for **gpt-4.1-mini (2)** and then select **gpt-4.1-mini (3)**.
+1. On the Microsoft Foundry portal from the left navigation pane, select **Model catalog (1)**. Scroll down and search for **gpt-5.4-mini (2)** and then select **gpt-5.4-mini (3)**.
 
-    ![](../media/gpt-41-mini-model-new-01.png)
+    ![To be captured](../media/gpt-54-mini-model-catalog.png)
 
 1. Click on **Use this model**.
 
@@ -80,12 +92,12 @@ In this task, you will deploy models in your Microsoft Foundry project. You need
 
     ![](../media/rgv3.png)
 
-1. On **Deploy gpt-4.1-mini** window,
+1. On **Deploy gpt-5.4-mini** window,
 
     - Select **Global Standard (1)** as Deployment type
     - Select **Connect and deploy (2)**
 
-      ![](../media/deploy-gpt-41-model.png)
+      ![To be captured](../media/deploy-gpt-54-mini-model.png)
 
 1. On the Microsoft Foundry portal, from the left navigation pane click on the **Model catalog (1)** option twice, search for **text-embedding-ada-002 (2),** and then select **text-embedding-ada-002 (3)**.
 
@@ -113,7 +125,7 @@ In this task, you will deploy models in your Microsoft Foundry project. You need
 
 1. From the left navigation pane, click on **Models+Endpoints (1)**, you can see the deployed models **(2)**.
 
-    ![](../media/gpt-41-text-ada-models.png)
+    ![To be captured](../media/gpt-54-mini-text-ada-models.png)
 
 > **Congratulations** on completing the task! Now, it's time to validate it. Here are the steps:
 > - Hit the Validate button for the corresponding task. If you receive a success message, you can proceed to the next task.
@@ -241,7 +253,7 @@ In this task, you will configure the environment variables that connect your RAG
 
 1. Rename the file to `.env`.
 
-1. Select the `.env` **(1)** file and replace **your_project_endpoint (2)** with the **Project endpoint** you copied in **Task 1**, and then ensure that the **CHAT_MODEL**, **EVALUATION_MODEL**, and **INTENT_MAPPING_MODEL** values are set to **gpt-4.1-mini**.
+1. Select the `.env` **(1)** file and replace **your_project_endpoint (2)** with the **Project endpoint** you copied in **Task 1**, and then ensure that the **CHAT_MODEL**, **EVALUATION_MODEL**, and **INTENT_MAPPING_MODEL** values are set to **gpt-5.4-mini**.
 
     ![To be captured](../media/dot-env-project-endpoint.png)
 
@@ -255,7 +267,7 @@ In this task, you will configure the environment variables that connect your RAG
 In this exercise, you have successfully:
 
 - Created a hub-less project in the new Microsoft Foundry portal and copied its project endpoint.
-- Deployed the gpt-4.1-mini model for chat-based interactions and the text-embedding-ada-002 model for generating embeddings.
+- Deployed the gpt-5.4-mini model for chat-based interactions and the text-embedding-ada-002 model for generating embeddings.
 - Provisioned an Azure AI Search service in Microsoft Azure.
 - Connected the Azure AI Search service to your project to enable retrieval capabilities.
 - Cloned the GitHub repository to access the required code and resources for building the chat application.

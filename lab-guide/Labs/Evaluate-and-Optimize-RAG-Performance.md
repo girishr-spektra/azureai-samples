@@ -58,7 +58,7 @@ In this task, you will install the ASSERT framework and configure it to use your
    copy .env.example .env
    ```
 
-1. Open the **ASSERT/.env (1)** file, and then set the model provider values so ASSERT can call your deployed **gpt-4.1-mini** model and run the LLM judge. Use your Microsoft Foundry project endpoint and deployed model name.
+1. Open the **ASSERT/.env (1)** file, and then set the model provider values so ASSERT can call your deployed **gpt-5.4-mini** model and run the LLM judge. Use your Microsoft Foundry project endpoint and deployed model name.
 
    ![To be captured](../media/assert-env-config.png)
 
@@ -107,7 +107,7 @@ In this task, you will describe the behaviors your assistant must follow in a na
        - Off-topic questions are politely declined.
 
    judge:
-     model: gpt-4.1-mini
+     model: gpt-5.4-mini
    ```
 
    > [!NOTE]
@@ -180,7 +180,7 @@ You have successfully evaluated and improved the RAG app with ASSERT.
 
 In this exercise, you evaluated and improved your RAG application with ASSERT instead of inspecting prompts and responses manually.
 
-- First, you installed ASSERT and configured it to use your deployed **gpt-4.1-mini** model for test-case generation and the LLM judge.
+- First, you installed ASSERT and configured it to use your deployed **gpt-5.4-mini** model for test-case generation and the LLM judge.
 - Then, you defined an evaluation specification capturing grounding, citation, clarification, and safety behaviors, and wrapped the RAG app as a callable target.
 - Next, you ran ASSERT to generate spec-driven test cases and score responses, and reviewed the local artifacts and viewer to find low-scoring behaviors.
 - After that, you improved the prompt in `grounded_chat.prompty` to guide the model toward better, more context-aware answers.
