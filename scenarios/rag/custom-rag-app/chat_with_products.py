@@ -14,9 +14,9 @@ from get_product_documents import get_product_documents
 logger = get_logger(__name__)
 tracer = trace.get_tracer(__name__)
 
-# create a project client using environment variables loaded from the .env file
-project = AIProjectClient.from_connection_string(
-    conn_str=os.environ["AIPROJECT_CONNECTION_STRING"], credential=DefaultAzureCredential()
+# create a project client using the project endpoint loaded from the .env file
+project = AIProjectClient(
+    endpoint=os.environ["PROJECT_ENDPOINT"], credential=DefaultAzureCredential()
 )
 
 # create a chat client we can use for testing

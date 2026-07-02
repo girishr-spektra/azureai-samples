@@ -37,19 +37,17 @@ def enable_telemetry(log_to_project: bool = False):
     if log_to_project:
         from azure.monitor.opentelemetry import configure_azure_monitor
 
-        project = AIProjectClient.from_connection_string(
-            conn_str=os.environ["AIPROJECT_CONNECTION_STRING"], credential=DefaultAzureCredential()
+        project = AIProjectClient(
+            endpoint=os.environ["PROJECT_ENDPOINT"], credential=DefaultAzureCredential()
         )
-        tracing_link = f"https://ai.azure.com/tracing?wsid=/subscriptions/{project.scope['subscription_id']}/resourceGroups/{project.scope['resource_group_name']}/providers/Microsoft.MachineLearningServices/workspaces/{project.scope['project_name']}"
         application_insights_connection_string = project.telemetry.get_connection_string()
         if not application_insights_connection_string:
             logger.warning(
-                "No application insights configured, telemetry will not be logged to project. Add application insights at:"
+                "No Application Insights configured. Telemetry will not be logged to the project. "
+                "Add Application Insights from the Tracing tab in the Microsoft Foundry portal."
             )
-            logger.warning(tracing_link)
 
             return
 
         configure_azure_monitor(connection_string=application_insights_connection_string)
-        logger.info("Enabled telemetry logging to project, view traces at:")
-        logger.info(tracing_link)
+        logger.info("Enabled telemetry logging to the project. View traces in the Tracing tab of the Microsoft Foundry portal.")

@@ -236,10 +236,10 @@ In this task, you will clone the GitHub repository for the project to access the
 1. Install the required Microsoft Foundry SDK packages:
 
     ```
-    pip install azure-ai-projects>=2.0.0
+    pip install azure-ai-projects==1.0.0b11 azure-ai-inference[prompts]==1.0.0b9
     ```
 
-   > **Note:** Version 2.x uses the new **Foundry projects** API and is not compatible with the 1.x SDK. Wait for the installation to complete. It might take some time.
+   > **Note:** This lab pins **azure-ai-projects 1.0.0b11** — the version that supports the hub-less **project endpoint** while still providing the inference clients that the sample uses. Wait for the installation to complete. It might take some time.
 
 ### Task 6: Configure Environment Variables
 
@@ -258,7 +258,11 @@ In this task, you will configure the environment variables that connect your RAG
     ![To be captured](../media/dot-env-project-endpoint.png)
 
     > [!NOTE]
-    > The sample uses the `PROJECT_ENDPOINT` environment variable with the new Microsoft Foundry SDK. The connection string used by the classic hub-based SDK is no longer required.
+    > The sample uses the `PROJECT_ENDPOINT` environment variable with the endpoint-based Microsoft Foundry SDK. The connection string used by the classic hub-based SDK is no longer required.
+
+1. In the same `.env` file, set **SEARCH_ENDPOINT** to your Azure AI Search service URL and **SEARCH_KEY** to its admin key. Copy both from the **aisearch-<inject key="DeploymentID" enableCopy="false"/>** resource in the Azure portal — the URL from the **Overview** page, and the admin key from **Settings > Keys**.
+
+    ![To be captured](../media/dot-env-search-values.png)
 
 1. Press **Ctrl+S** to save the file.
 
