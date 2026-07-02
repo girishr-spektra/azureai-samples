@@ -1,6 +1,6 @@
 # Developing a Custom RAG App Using Microsoft Foundry
 
-### Overall Estimated Duration: 4 Hours
+### Overall Estimated Duration: 6 Hours
 
 ## 📘 Lab Scenario
 
@@ -22,7 +22,11 @@ By the end of this lab, you will be able to:
 
 - **Building a RAG pipeline**: In this hands-on exercise, you will gain insights about building a Retrieval-Augmented Generation (RAG) pipeline to enhance AI-generated responses. They will index knowledge sources, implement a retrieval pipeline, and generate responses enriched with relevant data. Additionally, they will integrate telemetry logging to monitor and optimize system performance.
 
-- **Evaluate and Optimize RAG Performance**: In this hands-on exercise, you will gain insights about evaluating and optimizing the performance of a Retrieval-Augmented Generation (RAG) system. They will use Azure AI evaluators to assess retrieval accuracy, implement evaluation methods to measure response quality, and interpret results to fine-tune the system’s efficiency.
+- **Evaluate and Optimize RAG Performance with ASSERT**: In this hands-on exercise, you will gain insights about evaluating and optimizing a Retrieval-Augmented Generation (RAG) system using ASSERT, Microsoft's open-source, policy-driven evaluation framework. You will define an evaluation specification, generate spec-driven test cases, score responses with an LLM judge, and re-run ASSERT to validate improvements instead of inspecting prompts manually.
+
+- **Deploy the RAG App as a Production Endpoint with Rayfin**: In this hands-on module, you will deploy the RAG app as a production REST endpoint using the Rayfin managed backend. You will scaffold a Rayfin project, define a backend function, deploy it to Microsoft Fabric, configure access controls, and expose a REST API that a front-end can consume.
+
+- **(Optional) Connect Web IQ and Foundry IQ for Hybrid Grounding**: In this optional module, you will add hybrid grounding by combining Foundry IQ, the knowledge layer over your enterprise data, with Web IQ, the live web grounding introduced at Build 2026, so the assistant can cite both enterprise and web sources.
   
 ## ⚙️ Prerequisites
 
@@ -51,6 +55,12 @@ The architecture involves using Microsoft Foundry to provision resources, includ
 1. **Retrieval-Augmented Generation (RAG) Pipeline**: The Retrieval-Augmented Generation (RAG) pipeline enhances model responses by combining vector-based retrieval with generative AI. It first fetches the most relevant context from indexed knowledge sources and then uses that context to guide the language model’s output. In this lab, the RAG pipeline is the central mechanism that improves answer accuracy and enables knowledge-grounded response generation.
 
 1. **Evaluation & Monitoring (Microsoft Foundry)**: Evaluation and monitoring in Microsoft Foundry allow you to assess retrieval accuracy, response quality, and overall system performance using built-in evaluators. These tools help identify improvement areas and ensure the RAG pipeline is functioning effectively. In this lab, you will implement telemetry logging using Application Insights to capture runtime metrics, track pipeline behavior, and monitor the application's health in real time.
+
+1. **ASSERT (Evaluation Framework)**: ASSERT (Adaptive Spec-driven Scoring for Evaluation and Regression Testing) is Microsoft's open-source, policy-driven evaluation framework. It turns natural-language behavior specifications into executable test cases, runs them against your app, and scores each response with an LLM judge. In this lab, ASSERT replaces manual prompt inspection with repeatable, spec-driven evaluation and regression testing.
+
+1. **Rayfin (Managed Backend)**: Rayfin is a fully managed Backend-as-a-Service platform built on Microsoft Fabric. It provisions a database, authentication, data APIs, storage, and hosting from your code. In this lab, Rayfin hosts the RAG app as a production REST endpoint with enterprise access controls that a front-end can consume.
+
+1. **Foundry IQ & Web IQ (Grounding)**: Foundry IQ is the knowledge layer that unifies enterprise knowledge sources behind a single retrieval endpoint, and Web IQ provides low-latency live web grounding. In this optional part of the lab, they combine to give the assistant hybrid enterprise and web grounding with citations from both.
 
 ## 📁 Repository Structure
 

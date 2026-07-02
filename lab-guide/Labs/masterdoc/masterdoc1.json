@@ -19,6 +19,14 @@
             {
                 "RawFilePath": "https://docs-api.cloudlabs.ai/repos/raw.githubusercontent.com/CloudLabsAI-Azure/Build-Custom-Knowledge-RAG-App-With-Azure-AI-Foundry/refs/heads/main/Instructions/Labs/Evaluate-and-Optimize-RAG-Performance.md",
                 "Order": 4
+            },
+            {
+                "RawFilePath": "https://docs-api.cloudlabs.ai/repos/raw.githubusercontent.com/CloudLabsAI-Azure/Build-Custom-Knowledge-RAG-App-With-Azure-AI-Foundry/refs/heads/main/Instructions/Labs/Deploy-the-RAG-App-as-a-Production-Endpoint-with-Rayfin.md",
+                "Order": 5
+            },
+            {
+                "RawFilePath": "https://docs-api.cloudlabs.ai/repos/raw.githubusercontent.com/CloudLabsAI-Azure/Build-Custom-Knowledge-RAG-App-With-Azure-AI-Foundry/refs/heads/main/Instructions/Labs/Connect-Web-IQ-and-Foundry-IQ-for-Hybrid-Grounding.md",
+                "Order": 6
             }            
         ]
     }
