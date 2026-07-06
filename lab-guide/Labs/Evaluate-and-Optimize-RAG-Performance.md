@@ -193,7 +193,10 @@ In this task, you will run ASSERT against your RAG app, review the scored artifa
    assert-ai run --config eval_config.yaml
    ```
 
-   > **Note:** ASSERT generates test cases from your specification, runs them against the target, and scores each conversation with an LLM judge. Expect this to take several minutes.
+   > **Note:** ASSERT generates test cases from your specification, runs them against the target, and scores each conversation with an LLM judge. Expect this to take several minutes. The pipeline runs four stages in order: **systematize** (behavior taxonomy), **test_set** (test case generation), **inference** (runs your RAG app), and **judge** (scores each response).
+
+   > [!NOTE]
+   > You may see a warning that test cases cover only 3 of 4 behavior categories. This is expected with the small sample sizes used in this lab and does not stop the run. To cover all categories, you can increase `sample_size` to 4 or higher in `eval_config.yaml`, at the cost of a longer run.
 
 1. Review the console summary, which reports pass and fail results across the behaviors and judge dimensions defined in your specification.
 

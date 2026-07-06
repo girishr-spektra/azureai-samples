@@ -51,6 +51,7 @@ from azure.search.documents.indexes.models import (
     ExhaustiveKnnParameters,
     VectorSearchProfile,
     SearchIndex,
+    CorsOptions,
 )
 
 
@@ -124,11 +125,15 @@ def create_index_definition(index_name: str, model: str) -> SearchIndex:
     semantic_search = SemanticSearch(configurations=[semantic_config])
 
     # Create the search index definition
+    # CORS is enabled so browser-based front-ends (for example, the Rayfin app in
+    # the deployment module) can query the index directly. Restrict allowed_origins
+    # to your app's origin in production.
     return SearchIndex(
         name=index_name,
         fields=fields,
         semantic_search=semantic_search,
         vector_search=vector_search,
+        cors_options=CorsOptions(allowed_origins=["*"], max_age_in_seconds=300),
     )
 
 
