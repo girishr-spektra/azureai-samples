@@ -34,51 +34,31 @@ In this task, you will create a **Microsoft Foundry** resource and project direc
 
 1. In the search bar, enter **Microsoft Foundry (1)**, and then select **Microsoft Foundry (2)** from the results.
 
-    ![To be captured](../media/foundry-portal-search.png)
+    ![.](../media/cust-rag-jul-ex1-g2.png)
 
-1. On the **Microsoft Foundry** page, select **+ Create**.
+1. On the **Microsoft Foundry** page, expand **Use with Foundry (1)**, select **Foundry (2)**, and then select **+ Create (3)**.
 
-    ![To be captured](../media/foundry-portal-create.png)
+    ![](../media/cust-rag-jul-ex1-g3.png)
 
-1. On the **Create a Microsoft Foundry resource** page, enter the following details, and then select **Review + create (6)**:
+1. On the **Create a Foundry resource** page, enter the following details, and then select **Review + create (6)**:
 
     - Subscription: Select the default subscription **(1)**
     - Resource group: **ragsdk-<inject key="DeploymentID" enableCopy="false"/> (2)**
-    - Region: **<inject key="Region" enableCopy="false"/> (3)**
-    - Name: **ContosoFoundry (4)**
-    - Project name: **ContosoTrek (5)**
+    - Name: **ContosoFoundry<inject key="DeploymentID" enableCopy="false"/> (3)**
+    - Region: **<inject key="Region" enableCopy="false"/> (4)**
+    - Default project name: **ContosoTrek (5)**
 
-      ![To be captured](../media/foundry-portal-create-details.png)
+        ![](../media/cust-rag-jul-ex1-g4.png)
 
 1. Review the configuration settings, and then select **Create**.
 
-    ![To be captured](../media/foundry-portal-review-create.png)
-
 1. Wait for the deployment to complete, and then select **Go to resource**.
 
-    ![To be captured](../media/foundry-portal-go-to-resource.png)
+    ![](../media/cust-rag-jul-ex1-g5.png)
 
-1. On the resource **Overview** page, select **Go to Microsoft Foundry portal** to open your **ContosoTrek** project.
+1. On the **Overview (1)** page of the **ContosoFoundry** resource, select **Go to Foundry portal (2)**.
 
-    ![To be captured](../media/foundry-portal-launch.png)
-
-1. On the project **Overview** page, copy the **Project endpoint**, and then paste it into a notepad. You will use it to configure the environment variables in Task 6.
-
-    > [!NOTE]
-    > The project endpoint uses the format `https://<resource-name>.ai.azure.com/api/projects/ContosoTrek`.
-
-    ![To be captured](../media/foundry-project-endpoint.png)
-
-1. In the Azure portal, open the **ContosoFoundry** resource, select **Access control (IAM) (1)**, select **Add (2)**, and then select **Add role assignment (3)**.
-
-    ![To be captured](../media/foundry-iam-add-role.png)
-
-1. On the **Role** tab, search for and select **Azure AI User (1)**, and then select **Next (2)**.
-
-    > [!IMPORTANT]
-    > Select **Azure AI User**, not **Azure AI Developer**. Only **Azure AI User** grants the data-plane permission needed to call the deployed models.
-
-    ![To be captured](../media/foundry-role-ai-user.png)
+    ![](../media/cust-rag-jul-ex1-g6.png)
 
 1. On the **Members** tab, select **Assign access to (1)** as **User, group, or service principal**, select **+ Select members (2)**, choose **<inject key="AzureAdUserEmail" enableCopy="false"/> (3)**, and then select **Review + assign (4)**.
 
@@ -98,71 +78,56 @@ In this task, you will create a **Microsoft Foundry** resource and project direc
 
 In this task, you will deploy models in your Microsoft Foundry project. You need two models to build a RAG-based chat app: an Azure OpenAI chat model (gpt-5-mini) and an Azure OpenAI embedding model (text-embedding-ada-002).
 
-1. On the Microsoft Foundry portal from the left navigation pane, select **Model catalog (1)**. Scroll down and search for **gpt-5-mini (2)** and then select **gpt-5-mini (3)**.
+1. In the **Build (1)** section, select **Models (2)**, and then select **Deploy a base model (3)**.
 
-    ![To be captured](../media/gpt-54-mini-model-catalog.png)
+    ![](../media/cust-rag-jul-ex1-g7.png)
 
-1. Click on **Use this model**.
+1. Search for **gpt-5-mini (1)**, and then select **gpt-5-mini (2)** from the search results.
 
-    ![](../media/E1T2S2-2111.png)
+    ![](../media/cust-rag-jul-ex1-g17.png)
 
-1. Select **Direct from Azure models** as Purchase options.
+1. Select **Deploy (1)**, and then choose **Custom settings (2)**.
 
-    ![](../media/rgv3.png)
+    ![](../media/cust-rag-jul-ex1-g18.png)
 
-1. On **Deploy gpt-5-mini** window,
+1. On the **Deploy gpt-5-mini** pane, set **Tokens per Minute Rate Limit (1)** to **30000**, and then select **Deploy (2)**.
 
-    - Select **Global Standard (1)** as Deployment type
-    - Select **Connect and deploy (2)**
+    ![](../media/cust-rag-jul-ex1-g19.png)
 
-      ![To be captured](../media/deploy-gpt-54-mini-model.png)
+1. From the left navigation pane, select **Models (1)**, and then select **Deploy a base model (2)**.
 
-1. On the Microsoft Foundry portal, from the left navigation pane click on the **Model catalog (1)** option twice, search for **text-embedding-ada-002 (2),** and then select **text-embedding-ada-002 (3)**.
+    ![](../media/cust-rag-jul-ex1-g12.png)
 
-    ![](../media/new/2.png)
+1. Search for **text-embedding-ada-002 (1)**, and then select **text-embedding-ada-002 (2)** from the search results.
 
-1. Click on **Use this model**.
+    ![](../media/cust-rag-jul-ex1-g13.png)
 
-    ![](../media/E1T2S6-2111.png)
+1. Select **Deploy (1)**, and then choose **Custom settings (2)**.
 
-1. Select **Direct from Azure models** as Purchase options.
+    ![](../media/cust-rag-jul-ex1-g14.png)
 
-    ![](../media/rgv3.png)
+1. On the **Deploy text-embedding-ada-002** pane, set **Tokens per Minute Rate Limit (1)** to **30000**, and then select **Deploy (2)**.
 
-1. On the **Deploy model text-embedding-ada-002** window,
+    ![](../media/cust-rag-jul-ex1-g15.png)
 
-    - Deployment type: **Standard (1)**
-      
-      ![](../media/rg8.png)  
-      
-    - Tokens per Minute Rate limit: **20k (2)**
-      
-    - Click on **Deploy (3)**
+1. On the **Home (1)** page, copy the **Project endpoint (2)**, and then paste it into a notepad. You will use it to configure the environment variables in Task 6.
 
-      ![](../media/E1T2S7.2-2310.png)  
+    > [!NOTE]
+    > The project endpoint uses the format `https://<resource-name>.services.ai.azure.com/api/projects/<project-name>`.
 
-1. From the left navigation pane, click on **Models+Endpoints (1)**, you can see the deployed models **(2)**.
-
-    ![To be captured](../media/gpt-54-mini-text-ada-models.png)
-
-> **Congratulations** on completing the task! Now, it's time to validate it. Here are the steps:
-> - Hit the Validate button for the corresponding task. If you receive a success message, you can proceed to the next task.
-> - If not, carefully read the error message and retry the step, following the instructions in the exercise guide. 
-> - If you need any assistance, please contact us at cloudlabs-support@spektrasystems.com. We are available 24/7 to assist you. 
-
-<validation step="9712c051-408a-4142-9efa-0337dca323d9" />
+    ![](../media/cust-rag-jul-ex1-g30.png)
 
 ### Task 3: Create an Azure AI Search Service
 
 In this task, you will create an Azure AI Search service. You need an Azure AI Search service and a connection to create a search index.
 
-1. In the exercise VM browser, navigate to the Azure portal by entering [https://portal.azure.com](https://portal.azure.com) in the address bar. In the Azure portal, in the search box, type **AI Search (1)**, and select **AI Search (2)** from the results.
+1. In the Azure portal, search for **AI Search (1)**, and then select **AI Search (Foundry IQ) (2)** from the results.
 
-    ![](../media/RAG1.png)
+    ![](../media/cust-rag-jul-ex1-g20.png)
 
-1. On the **Microsoft Foundry | AI Search** page, select **+ Create** to begin provisioning the Azure AI Search service.
+1. On the **AI Search (1)** page, select **+ Create (2)**.
 
-    ![](../media/RAG2.png)
+    ![](../media/cust-rag-jul-ex1-g21.png)
 
 1. On the **Create a search service** page, provide the following details, then click on **Review + create (6)**:
             
@@ -193,21 +158,24 @@ In this task, you will create an Azure AI Search service. You need an Azure AI S
 
 In this task, you will connect the Azure AI Search service to your project. Azure AI Search service and connection are used to create a search index. The search index is used to retrieve relevant documents based on the user's question.
 
-1. Navigate back to the **Microsoft Foundry** portal, and select **Management center** from the left pane.
+1. From the left navigation pane, select **Knowledge**.
 
-    ![](../media/E1T4S1-2111.png)
+    ![](../media/cust-rag-jul-ex1-g22.png)
 
-1. Select **Connected resources (1)** under the **Project (ContosoTrek)** section, then select **+ New connection (2)**.
+1. Scroll down if necessary, select the **Foundry IQ resource (1)** dropdown, choose your **AI Search resource (2)**, keep **Auth Type** as **API Key**, and then select **Connect**.
 
-    ![](../media/E1T4S2-2111.png)
+    > [!NOTE]
+    > You may need to scroll down to view the **Foundry IQ resource** option.
 
-1. Search for Azure **AI Search (1)**, then select **Azure AI Search (2)**.
+    ![](../media/cust-rag-jul-ex1-g23.png)
 
-    ![](../media/af18.png)
+1. Verify that **Auth Type (1)** is set to **API Key**, and then select **Connect (2)**.
 
-1. Search for the Azure AI Search service you created, **aisearch-<inject key="DeploymentID" enableCopy="false"/> (1)**. Use the **API key (2)** for authentication and then select **Add connection (3)**.
+    ![](../media/cust-rag-jul-ex1-g24.png)
 
-    ![](../media/af19.png)
+1. On the **Overview (1)** page of your **AI Search** resource, copy the **URL (2)**. You will use this value as the **SEARCH_ENDPOINT** in Task 6.
+
+    ![](../media/cust-rag-jul-ex1-g25.png)
 
 1. Make sure that AI Search is **Connected**.
 
@@ -233,11 +201,12 @@ In this task, you will clone the GitHub repository for the project to access the
 
     ![](../media/af25.png)
 
-1. Expand **scenarios (1)**, then **rag/custom-rag-app (2)**. Select **requirements.txt (3)**. This file contains the necessary packages for setting up the Microsoft Foundry SDK. **(4)**
+1. Expand **scenarios (1)**, expand **rag\custom-rag-app (2)**, and then select **requirements.txt (3)** to review the required Microsoft Foundry SDK packages **(4)**.
 
-    ![](../media/af-27.png)
+    > [!NOTE]
+    > This file contains the required packages for building and managing an AI-powered application using the Microsoft Foundry SDK, including authentication, AI inference, search, data processing, and telemetry logging.
 
-     >**Note**: This file contains the necessary packages for building and managing an AI-powered application using the Microsoft Foundry SDK, including authentication, AI inference, search, data processing, and telemetry logging.
+    ![](../media/cust-rag-jul-ex1-g31.png)
 
 1. Right-click on the **rag/custom-rag-app (1)** folder, then select **Open in Integrated Terminal (2)**.
 
@@ -271,16 +240,9 @@ In this task, you will configure the environment variables that connect your RAG
 
 1. Rename the file to `.env`.
 
-1. Select the `.env` **(1)** file and replace **your_project_endpoint (2)** with the **Project endpoint** you copied in **Task 1**, and then ensure that the **CHAT_MODEL**, **EVALUATION_MODEL**, and **INTENT_MAPPING_MODEL** values are set to **gpt-5-mini**.
+1. Select the **.env (1)** file, update the environment variables using the **Project endpoint**, **SEARCH_ENDPOINT**, and **SEARCH_KEY** values you copied earlier, verify that **CHAT_MODEL**, **EMBEDDING_MODEL**, **EVALUATION_MODEL**, and **INTENT_MAPPING_MODEL** are set as shown **(2)**, and then save the file.
 
-    ![To be captured](../media/dot-env-project-endpoint.png)
-
-    > [!NOTE]
-    > The sample uses the `PROJECT_ENDPOINT` environment variable with the endpoint-based Microsoft Foundry SDK. The connection string used by the classic hub-based SDK is no longer required.
-
-1. In the same `.env` file, set **SEARCH_ENDPOINT** to your Azure AI Search service URL and **SEARCH_KEY** to its admin key. Copy both from the **aisearch-<inject key="DeploymentID" enableCopy="false"/>** resource in the Azure portal — the URL from the **Overview** page, and the admin key from **Settings > Keys**.
-
-    ![To be captured](../media/dot-env-search-values.png)
+    ![](../media/cust-rag-jul-ex1-g27.png)
 
 1. Press **Ctrl+S** to save the file.
 
