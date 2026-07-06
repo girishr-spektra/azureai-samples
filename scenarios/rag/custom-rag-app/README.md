@@ -94,16 +94,18 @@ If you haven't already, you'll need to log in to the Azure CLI in your terminal.
 az login
 ```
 
-## Configure project string
-
-Go back to the **Overview** page of your project, and in the upper right hand corner click the copy button beside the **Project connection string** field.
+## Configure the environment file
 
 Create a ```.env``` file using the sample:
 ```
 cp .env.sample .env
 ```
 
-Open the ```.env``` file and paste (ctrl-v) the value to the right of the ```AIPROJECT_CONNECTION_STRING=``` variable.
+Open the ```.env``` file and set the following values:
+
+- ```PROJECT_ENDPOINT``` — the **Project endpoint** from your Microsoft Foundry project **Overview** page.
+- ```SEARCH_ENDPOINT``` and ```SEARCH_KEY``` — the URL and an admin key from your Azure AI Search service.
+- ```CHAT_MODEL```, ```EMBEDDINGS_MODEL```, ```EVALUATION_MODEL```, and ```INTENT_MAPPING_MODEL``` — the names of your deployed models.
 
 
 ### Run the sample!
@@ -139,14 +141,6 @@ Click the link at the start of the output to view your traces in Azure AI Studio
 
 #### Evaluation
 
-Install packages needed to run evaluation (this can take up to 8 minutes):
-```
-pip install azure-ai-evaluation[remote]
-```
-
-Run evaluation:
-```
-python evaluate.py
-```
+Evaluation is covered in the lab using **ASSERT**, Microsoft's open-source, policy-driven evaluation framework. See **Exercise 3** of the lab guide for the full walkthrough.
 
 ### Estimated Runtime: 30 mins

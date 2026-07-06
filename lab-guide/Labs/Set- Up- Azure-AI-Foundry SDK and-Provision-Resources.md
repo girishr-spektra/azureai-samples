@@ -69,6 +69,24 @@ In this task, you will create a **Microsoft Foundry** resource and project direc
 
     ![To be captured](../media/foundry-project-endpoint.png)
 
+1. In the Azure portal, open the **ContosoFoundry** resource, select **Access control (IAM) (1)**, select **Add (2)**, and then select **Add role assignment (3)**.
+
+    ![To be captured](../media/foundry-iam-add-role.png)
+
+1. On the **Role** tab, search for and select **Azure AI User (1)**, and then select **Next (2)**.
+
+    > [!IMPORTANT]
+    > Select **Azure AI User**, not **Azure AI Developer**. Only **Azure AI User** grants the data-plane permission needed to call the deployed models.
+
+    ![To be captured](../media/foundry-role-ai-user.png)
+
+1. On the **Members** tab, select **Assign access to (1)** as **User, group, or service principal**, select **+ Select members (2)**, choose **<inject key="AzureAdUserEmail" enableCopy="false"/> (3)**, and then select **Review + assign (4)**.
+
+    ![To be captured](../media/foundry-role-assign-member.png)
+
+    > [!NOTE]
+    > The **Azure AI User** role grants the data-plane permission required to call the deployed models (for example, `Microsoft.CognitiveServices/.../chat/completions/action`). The **Owner** and **Azure AI Developer** roles do not grant model inference access. Role changes can take a few minutes to take effect.
+
    > **Congratulations** on completing the task! Now, it's time to validate it. Here are the steps:    
    - Hit the validate button for the corresponding task. If you receive a success message, you can proceed to the next task.
    - If not, carefully read the error message and retry the step, following the instructions in the exercise guide.
