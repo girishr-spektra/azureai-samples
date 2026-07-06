@@ -26,7 +26,7 @@ In this module, you will complete the following tasks:
 ## Prerequisites
 
 - A completed and evaluated RAG app from the previous modules.
-- Your Microsoft Foundry **Project endpoint** and deployed **gpt-5.4-mini** model.
+- Your Microsoft Foundry **Project endpoint** and deployed **gpt-5-mini** model.
 - **Node.js LTS** installed on the lab virtual machine.
 - Access to a **Microsoft Fabric** workspace in your Azure subscription.
 

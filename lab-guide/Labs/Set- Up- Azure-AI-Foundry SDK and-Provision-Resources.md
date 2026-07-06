@@ -96,9 +96,9 @@ In this task, you will create a **Microsoft Foundry** resource and project direc
 
 ### Task 2: Deploying and Managing AI Models 
 
-In this task, you will deploy models in your Microsoft Foundry project. You need two models to build a RAG-based chat app: an Azure OpenAI chat model (gpt-5.4-mini) and an Azure OpenAI embedding model (text-embedding-ada-002).
+In this task, you will deploy models in your Microsoft Foundry project. You need two models to build a RAG-based chat app: an Azure OpenAI chat model (gpt-5-mini) and an Azure OpenAI embedding model (text-embedding-ada-002).
 
-1. On the Microsoft Foundry portal from the left navigation pane, select **Model catalog (1)**. Scroll down and search for **gpt-5.4-mini (2)** and then select **gpt-5.4-mini (3)**.
+1. On the Microsoft Foundry portal from the left navigation pane, select **Model catalog (1)**. Scroll down and search for **gpt-5-mini (2)** and then select **gpt-5-mini (3)**.
 
     ![To be captured](../media/gpt-54-mini-model-catalog.png)
 
@@ -110,7 +110,7 @@ In this task, you will deploy models in your Microsoft Foundry project. You need
 
     ![](../media/rgv3.png)
 
-1. On **Deploy gpt-5.4-mini** window,
+1. On **Deploy gpt-5-mini** window,
 
     - Select **Global Standard (1)** as Deployment type
     - Select **Connect and deploy (2)**
@@ -271,7 +271,7 @@ In this task, you will configure the environment variables that connect your RAG
 
 1. Rename the file to `.env`.
 
-1. Select the `.env` **(1)** file and replace **your_project_endpoint (2)** with the **Project endpoint** you copied in **Task 1**, and then ensure that the **CHAT_MODEL**, **EVALUATION_MODEL**, and **INTENT_MAPPING_MODEL** values are set to **gpt-5.4-mini**.
+1. Select the `.env` **(1)** file and replace **your_project_endpoint (2)** with the **Project endpoint** you copied in **Task 1**, and then ensure that the **CHAT_MODEL**, **EVALUATION_MODEL**, and **INTENT_MAPPING_MODEL** values are set to **gpt-5-mini**.
 
     ![To be captured](../media/dot-env-project-endpoint.png)
 
@@ -289,7 +289,7 @@ In this task, you will configure the environment variables that connect your RAG
 In this exercise, you have successfully:
 
 - Created a hub-less project in the new Microsoft Foundry portal and copied its project endpoint.
-- Deployed the gpt-5.4-mini model for chat-based interactions and the text-embedding-ada-002 model for generating embeddings.
+- Deployed the gpt-5-mini model for chat-based interactions and the text-embedding-ada-002 model for generating embeddings.
 - Provisioned an Azure AI Search service in Microsoft Azure.
 - Connected the Azure AI Search service to your project to enable retrieval capabilities.
 - Cloned the GitHub repository to access the required code and resources for building the chat application.
