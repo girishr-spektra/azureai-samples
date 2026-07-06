@@ -17,14 +17,15 @@ In this exercise, you will complete the following tasks:
 - Task 1: Indexing Knowledge Sources
 - Task 2: Implementing the Retrieval Pipeline
 - Task 3: Generating Responses with Augmented Knowledge
-- Task 4: Add telemetry logging
+- Task 4: Create a ContosoAgent
+- Task 5: Add Telemetry Logging
 
 ## Task 1: Indexing Knowledge Sources 
 
 In this task, you will index knowledge sources by processing and storing vectorized data from a CSV file using a search index. You will also authenticate your Azure account, execute the indexing script, and register the index to your cloud project.
 
 > [!NOTE]
-> The sample scripts use the new **Microsoft Foundry SDK** (`azure-ai-projects` 2.x). They authenticate to your project with the `PROJECT_ENDPOINT` value you configured in the `.env` file, so no code changes are required.
+> The sample scripts use the endpoint-based **Microsoft Foundry SDK** (`azure-ai-projects==1.0.0b11`). They authenticate to your project with the `PROJECT_ENDPOINT` value you configured in the `.env` file, so no code changes are required.
 
 1. In the Visual Studio Code, expand the **assets (1)** folder and select **products.csv** file **(2)**. Review the file. It contains example datasets used in your chat application.
 
@@ -156,59 +157,123 @@ In this task, you will generate responses using augmented knowledge by leveragin
 1. Enter **Clear** in the terminal, to clear the terminal history.   
    
 
-## Task 4: Add Telemetry Logging
+## Task 4: Create a ContosoAgent
 
-In this task, you will enable telemetry logging by integrating Application Insights into your project. This allows you to monitor and analyze your RAG application's performance, track queries, and log response details for better observability and debugging.
+In this task, you will create a prompt agent named **ContosoAgent** in the Microsoft Foundry portal. This agent uses your deployed **gpt-5-mini** model and will be used to verify telemetry in the next task.
 
-1. Navigate back to the **Microsoft Foundry** portal.
+1. Navigate back to the **Microsoft Foundry** portal. Ensure the **New Foundry** toggle is on.
 
-1. Select the **Tracing (1)** tab to add an **Application Insights** resource to your project, and then click on the **Create new (2)** option to create a new resource.
+    ![To be captured](../media/foundry-new-foundry-toggle.png)
 
-    ![](../media/L2T4S2-2111.png)
+1. From the left navigation pane, select **Agents**.
 
-1. Enter the name as **Applicationinsight (1)**, then click on **Create (2)**.
+    ![To be captured](../media/foundry-agents-nav.png)
 
-    ![](../media/af50.png)
+1. Select **+ New agent**.
 
-    > **Note:** Wait for the application insight to be created.
+    ![To be captured](../media/foundry-new-agent-button.png)
 
-1. Navigate back to the VS Code terminal and run the command below to install the `azure-monitor-opentelemetry`
+1. On the agent configuration page, enter **ContosoAgent (1)** as the agent name, and then select **gpt-5-mini (2)** as the model.
+
+    ![To be captured](../media/foundry-agent-name-model.png)
+
+1. Select **Global Standard (1)** as the deployment type.
+
+    ![To be captured](../media/foundry-agent-deployment-type.png)
+
+1. In the **Instructions** field, enter the following prompt:
+
+    ```
+    You are a helpful assistant for Contoso Knowledge Services. Answer employee questions using the retrieved product documents. Stay grounded in the provided context and ask for clarification when a request is vague.
+    ```
+
+    ![To be captured](../media/foundry-agent-instructions.png)
+
+1. Select **Save** to save the agent.
+
+    ![To be captured](../media/foundry-agent-save.png)
+
+1. Verify that the **ContosoAgent** opens in the **Playground** tab and that the model displays as **gpt-5-mini**.
+
+    ![To be captured](../media/foundry-agent-playground.png)
+
+1. In the **Chat** pane on the right, enter a test message, such as `What tents do you recommend for 4 people?`, and then verify that the agent returns a response.
+
+    ![To be captured](../media/foundry-agent-test-chat.png)
+
+You have successfully created the ContosoAgent.
+
+## Task 5: Add Telemetry Logging
+
+In this task, you will connect Application Insights to your Microsoft Foundry project and enable client-side telemetry so you can monitor and analyze your RAG application's performance in real time.
+
+### Connect Application Insights to the project
+
+1. In the **Microsoft Foundry** portal, open the **ContosoTrek** project.
+
+1. From the left navigation pane, select **Agents (1)**, and then select the **Traces (2)** tab at the top of the page.
+
+    ![To be captured](../media/foundry-agents-traces-tab.png)
+
+1. Select the **Monitor settings** icon (gear icon) to open the Monitor settings panel.
+
+    ![To be captured](../media/foundry-traces-monitor-settings-icon.png)
+
+1. In the **Monitor settings** panel, under **Application insights resource**, expand the **Application insights resource name (1)** dropdown, and then select **Create new resource (2)**.
+
+    ![](../media/foundry-traces-create-appinsights.png)
+
+    > [!NOTE]
+    > Selecting **Create new resource** provisions a new Application Insights resource directly into your Azure resource group — no separate Azure portal step is required. The resource appears in your subscription under the same `ragsdk-<inject key="DeploymentID" enableCopy="false"/>` resource group.
+
+1. On the **Create new resource** form, enter the following details, and then select **Create (3)**:
+
+    - **Name (1)**: **Appinsights-<inject key="DeploymentID" enableCopy="false"/>**
+    - **Log Analytics Workspace (2)**: Leave the default value as-is
+
+    ![To be captured](../media/foundry-traces-appinsights-name-create.png)
+
+    > **Note:** Do not change the **Log Analytics Workspace** value. The default new workspace shown is pre-configured for your environment. Wait for the resource to be created and connected before continuing.
+
+1. Verify that **App. Insights resource** changes from **Not connected** to the name of your new resource.
+
+    ![To be captured](../media/foundry-traces-appinsights-connected.png)
+
+1. Close the **Monitor settings** panel.
+
+### Run with telemetry enabled
+
+1. Navigate back to the **Visual Studio Code** terminal. Make sure you are in the **rag/custom-rag-app** directory.
+
+1. Add the `--enable-telemetry` flag when you run the `chat_with_products.py` script:
 
    ```bash
-   pip install azure-monitor-opentelemetry
+   python chat_with_products.py --query "I need a new tent for 4 people, what would you recommend?" --enable-telemetry
    ```
 
-    ![](../media/af51.png)   
+    ![](../media/af52.png)
 
-     >**Note:** Wait for the installation to complete. This might take few minutes.
+    > **Note:** The `--enable-telemetry` flag calls `enable_telemetry(True)` in `config.py`, which connects to Application Insights using `project.telemetry.get_connection_string()` and configures Azure Monitor. Wait for the script to finish before continuing.
 
-1. Add the `--enable-telemetry` flag when you use the `chat_with_products.py` script:
+### View traces in the Foundry portal
 
-   ```bash
-   python chat_with_products.py --query "I need a new tent for 4 people, what would you recommend?" --enable-telemetry 
-   ```      
+1. Navigate back to the **Microsoft Foundry** portal. From the left navigation pane, select **Agents**, and then select the **Traces** tab.
 
-    ![](../media/af52.png)   
+    ![To be captured](../media/foundry-traces-view.png)
 
-1. Press **Ctrl + Right click** on the link in the console output to see the telemetry data in your Application Insights resource **(1)** and click **Open (2)**.    
+1. Verify that a new trace entry appears in the list. Traces may take **5–10 minutes** to appear.
 
-    ![](../media/af53.png)
+    > **Note:** If no traces appear, wait a few minutes and then select **Refresh**.
 
-1. This will take you to the **Microsoft Foundry** portal, **Tracing** tab, where you can see the telemetry data in your Application Insights resource. 
+1. Select the trace entry to step through each span, view latency, prompt content, and retrieval operations.
 
-    ![](../media/L2T4S7-2111.png)
+    ![To be captured](../media/foundry-trace-detail.png)
 
-     >**Note:**  Please keep **Refreshing** in the toolbar. It may take around 5 - 10 minutes to appear.
-
-1. In your project, you can **filter** your traces as you see fit. Click on **Filter**.
-
-    ![](../media/af55.png)
-
-1. Click on **+ Add filter (1)**, set the filter to **Success (2)**, **Equal to (3)** -> **True (4),** and then click on **Apply (5)**.
+1. Select **Filter (1)**, then select **+ Add filter (2)**, set the filter to **Success (3)** → **Equal to (4)** → **True (5)**, and then select **Apply (6)**.
 
     ![](../media/L2T4S9-2111.png)
 
-1. Now, you can only see the data with Success as **True**.
+1. Verify that only traces with **Success = True** are displayed.
 
     ![](../media/af57.png)
 
@@ -219,7 +284,8 @@ In this exercise, you built a smart chatbot that doesn’t guess answers.
 - First, you uploaded product information from `products.csv` into a searchable system using `create_search_index.py`.
 - Then, when a user asks a question (like “I need a tent for 4 people”), your app uses `get_product_documents.py` to search and find the best matching products.
 - After that, `chat_with_products.py` takes those matching products and uses AI to generate a proper recommendation based on real data.
-- Finally, you enabled telemetry logging so you can track what the chatbot is doing and monitor performance using Application Insights.
+- Then, you created a **ContosoAgent** in the Microsoft Foundry portal using the deployed **gpt-5-mini** model and tested it in the Playground.
+- Finally, you connected Application Insights to your project, ran the chat app with the `--enable-telemetry` flag, and verified traces in the **Foundry portal** under **Agents → Traces**.
 
 ### You have successfully completed the exercise. Click **Next >>** to continue to the next exercise.
 
