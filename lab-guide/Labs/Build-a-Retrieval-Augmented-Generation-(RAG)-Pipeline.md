@@ -96,19 +96,11 @@ In this task, you will implement the retrieval pipeline by extracting relevant p
 
     > 📌 **You do not need to modify anything.**
 
-    ![](../media/af43.png)
+    ![](../media/cust-rag-jul-ex1-g29.png)
 
     - This file contains the code to import the required libraries, create a project client, and configure settings.
     - Code to add the function to get product documents.
     - Finally, add code to test the function when you run the script directly.
-
-1. Expand **assets (1)** and select **intent_mapping.prompty (2)**. This template instructs how to extract the user's intent from the conversation.
-
-    > 📌 **You do not need to modify anything.**
-
-    ![](../media/rgv8.png)
-
-    - The **get_product_documents.py** script uses this prompt template to convert the conversation to a search query.
 
 1. Please make sure your in **rag/custom-rag-app** directory.    
 
@@ -156,90 +148,48 @@ In this task, you will generate responses using augmented knowledge by leveragin
 
 1. Enter **Clear** in the terminal, to clear the terminal history.   
    
-
 ## Task 4: Create a ContosoAgent
 
 In this task, you will create a prompt agent named **ContosoAgent** in the Microsoft Foundry portal. This agent uses your deployed **gpt-5-mini** model and will be used to verify telemetry in the next task.
 
 1. Navigate back to the **Microsoft Foundry** portal. Ensure the **New Foundry** toggle is on.
 
-    ![To be captured](../media/foundry-new-foundry-toggle.png)
+1. In the **Build (1)** section, select **Agents (2)**, and then select **New agent (3)**.
 
-1. From the left navigation pane, select **Agents**.
+    ![](../media/cust-rag-jul-ex2-g1.png)
 
-    ![To be captured](../media/foundry-agents-nav.png)
+1. From the **New agent** menu, select **Build an agent**.
 
-1. Select **+ New agent**.
+    ![](../media/cust-rag-jul-ex2-g2.png)
 
-    ![To be captured](../media/foundry-new-agent-button.png)
+1. On the **Create an agent** pane, enter **ContosoAgent** as the **Agent name**, and then select **Create**.
 
-1. On the agent configuration page, enter **ContosoAgent (1)** as the agent name, and then select **gpt-5-mini (2)** as the model.
+    ![](../media/cust-rag-jul-ex2-g3.png)
 
-    ![To be captured](../media/foundry-agent-name-model.png)
-
-1. Select **Global Standard (1)** as the deployment type.
-
-    ![To be captured](../media/foundry-agent-deployment-type.png)
-
-1. In the **Instructions** field, enter the following prompt:
+1. In the **Instructions (1)** field, enter the provided prompt, and then select **Save (2)**.
 
     ```
     You are a helpful assistant for Contoso Knowledge Services. Answer employee questions using the retrieved product documents. Stay grounded in the provided context and ask for clarification when a request is vague.
     ```
 
-    ![To be captured](../media/foundry-agent-instructions.png)
+    ![](../media/cust-rag-jul-ex2-g4.png)
 
-1. Select **Save** to save the agent.
+1. Select the **Traces (1)** tab, and then select **Connect (2)**.
 
-    ![To be captured](../media/foundry-agent-save.png)
+    ![](../media/cust-rag-jul-ex2-g5.png)
 
-1. Verify that the **ContosoAgent** opens in the **Playground** tab and that the model displays as **gpt-5-mini**.
+1. In the **Monitor settings** pane, expand the **Application insights resource name (1)** dropdown, and then select **Create new resource (2)**.
 
-    ![To be captured](../media/foundry-agent-playground.png)
+    ![](../media/cust-rag-jul-ex2-g7.png)
 
-1. In the **Chat** pane on the right, enter a test message, such as `What tents do you recommend for 4 people?`, and then verify that the agent returns a response.
-
-    ![To be captured](../media/foundry-agent-test-chat.png)
-
-You have successfully created the ContosoAgent.
-
-## Task 5: Add Telemetry Logging
-
-In this task, you will connect Application Insights to your Microsoft Foundry project and enable client-side telemetry so you can monitor and analyze your RAG application's performance in real time.
-
-### Connect Application Insights to the project
-
-1. In the **Microsoft Foundry** portal, open the **ContosoTrek** project.
-
-1. From the left navigation pane, select **Agents (1)**, and then select the **Traces (2)** tab at the top of the page.
-
-    ![To be captured](../media/foundry-agents-traces-tab.png)
-
-1. Select the **Monitor settings** icon (gear icon) to open the Monitor settings panel.
-
-    ![To be captured](../media/foundry-traces-monitor-settings-icon.png)
-
-1. In the **Monitor settings** panel, under **Application insights resource**, expand the **Application insights resource name (1)** dropdown, and then select **Create new resource (2)**.
-
-    ![](../media/foundry-traces-create-appinsights.png)
+1. In the **Monitor settings** pane, enter **AppInsights-<inject key="DeploymentID" enableCopy="false"/> (1)** as the **Name**, leave the default **Log Analytics Workspace (2)** unchanged, and then select **Create (3)**.
 
     > [!NOTE]
-    > Selecting **Create new resource** provisions a new Application Insights resource directly into your Azure resource group — no separate Azure portal step is required. The resource appears in your subscription under the same `ragsdk-<inject key="DeploymentID" enableCopy="false"/>` resource group.
+    > Do not change the **Log Analytics Workspace** value. The default workspace is pre-configured for your environment.
 
-1. On the **Create new resource** form, enter the following details, and then select **Create (3)**:
+    ![](../media/cust-rag-jul-ex2-g8.png)
 
-    - **Name (1)**: **Appinsights-<inject key="DeploymentID" enableCopy="false"/>**
-    - **Log Analytics Workspace (2)**: Leave the default value as-is
-
-    ![To be captured](../media/foundry-traces-appinsights-name-create.png)
-
-    > **Note:** Do not change the **Log Analytics Workspace** value. The default new workspace shown is pre-configured for your environment. Wait for the resource to be created and connected before continuing.
-
-1. Verify that **App. Insights resource** changes from **Not connected** to the name of your new resource.
-
-    ![To be captured](../media/foundry-traces-appinsights-connected.png)
-
-1. Close the **Monitor settings** panel.
+You have successfully created the ContosoAgent.
 
 ### Run with telemetry enabled
 

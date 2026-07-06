@@ -60,19 +60,10 @@ In this task, you will create a **Microsoft Foundry** resource and project direc
 
     ![](../media/cust-rag-jul-ex1-g6.png)
 
-1. On the **Members** tab, select **Assign access to (1)** as **User, group, or service principal**, select **+ Select members (2)**, choose **<inject key="AzureAdUserEmail" enableCopy="false"/> (3)**, and then select **Review + assign (4)**.
-
-    ![To be captured](../media/foundry-role-assign-member.png)
-
-    > [!NOTE]
-    > The **Azure AI User** role grants the data-plane permission required to call the deployed models (for example, `Microsoft.CognitiveServices/.../chat/completions/action`). The **Owner** and **Azure AI Developer** roles do not grant model inference access. Role changes can take a few minutes to take effect.
-
    > **Congratulations** on completing the task! Now, it's time to validate it. Here are the steps:    
    - Hit the validate button for the corresponding task. If you receive a success message, you can proceed to the next task.
    - If not, carefully read the error message and retry the step, following the instructions in the exercise guide.
    - If you need any assistance, don't hesitate to get in touch with us at cloudlabs-support@spektrasystems.com. We are available 24/7 to assist you.
-
-   <validation step="116ffc00-e134-4fc6-82db-c383b9d13758" />
 
 ### Task 2: Deploying and Managing AI Models 
 
@@ -258,5 +249,3 @@ In this exercise, you have successfully:
 - Configured the necessary environment variables in the `.env` file to integrate your application with the Microsoft Foundry project and deployed models.
 
 ### You have successfully completed the exercise. Click **Next >>** to continue to the next exercise.
-
-![](../media/afg10.png)
