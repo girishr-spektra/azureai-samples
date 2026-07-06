@@ -30,13 +30,13 @@ In this task, you will install the ASSERT framework and configure it to use your
 
 1. Right-click the **rag/custom-rag-app (1)** folder, and then select **Open in Integrated Terminal (2)**. Make sure the terminal is in the **rag/custom-rag-app** directory.
 
-   ![To be captured](../media/assert-open-terminal.png)
-
 1. Clone the ASSERT repository into the current directory:
 
    ```bash
    git clone https://github.com/responsibleai/ASSERT.git
    ```
+
+   ![.](../media/cust-rag-jul-ex3-g1.png)
 
 1. Change into the ASSERT directory:
 
@@ -50,40 +50,39 @@ In this task, you will install the ASSERT framework and configure it to use your
    pip install -e ".[otel]"
    ```
 
+   ![.](../media/cust-rag-jul-ex3-g2.png)
+
    > **Note:** Wait for the installation to complete. This might take a few minutes.
 
-1. Open the **rag/custom-rag-app/.env (1)** file — the same file you configured in Exercise 1 — and add the following lines at the end, then press **Ctrl+S** to save the file.
+1. Navigate to the **Azure portal**, open the **ContosoFoundry** resource, and then select **Go to Foundry portal**.
+
+1. Expand **Resource Management (1)**, select **Keys and Endpoint (2)**, copy **KEY 1 (3)**, select the **OpenAI (4)** tab, and then copy the **OpenAI endpoint (5)**. You will use these values to configure ASSERT in the next step.
+
+   ![](../media/cust-rag-jul-ex3-g4.png)
+
+1. In **Visual Studio Code**, expand **rag\custom-rag-app (1)**, expand the **ASSERT (2)** folder, and then open the **.env (3)** file.
+
+   ![](../media/cust-rag-jul-ex3-g5.png)
+
+1. In the **.env** file, update the following values using the **KEY 1** and **OpenAI endpoint** you copied earlier, set **AZURE_OPENAI_DEPLOYMENT** to **gpt-5-mini**, ensure **ASSERT_AZURE_USE_AAD** is set to **1**, and then save the file.
 
    ```
+   AZURE_API_KEY="<your-azure-openai-KEY>"
    AZURE_API_BASE="<your-azure-openai-endpoint>"
    AZURE_OPENAI_DEPLOYMENT="gpt-5-mini"
    ASSERT_AZURE_USE_AAD=1
    ```
 
-   Replace **\<your-azure-openai-endpoint\>** with the **Azure OpenAI endpoint** from your Microsoft Foundry project **Overview** page. It uses the format `https://contosofoundry<inject key="DeploymentID" enableCopy="false"/>.openai.azure.com/`. Strip `/openai/v1` from the end if it is present.
+   ![.](../media/cust-rag-jul-ex3-g6.png)
 
-   > [!IMPORTANT]
-   > Add these values to **rag/custom-rag-app/.env**, not to the `ASSERT/.env` file. ASSERT loads the `.env` from the directory you run it in, which is **rag/custom-rag-app** in this lab. If `AZURE_API_BASE` is missing from that file, the run fails with `api_base is required for Azure AI Studio`.
-
-   > [!NOTE]
-   > `ASSERT_AZURE_USE_AAD=1` tells ASSERT to use your `az login` credentials instead of an API key, so no `AZURE_API_KEY` is needed. ASSERT routes all model calls through LiteLLM; the model string format for Azure deployments is `azure/<deployment-name>`.
-
-   ![To be captured](../media/assert-env-config.png)
 
 ## Task 2: Define an Evaluation Specification and Target
 
 In this task, you will describe the behaviors your assistant must follow in a natural-language specification and wrap the RAG app as an ASSERT target. ASSERT turns the specification into executable test cases, so you no longer inspect prompts and responses manually.
 
-> [!NOTE]
-> All files in this task must be created in **Visual Studio Code** — do **not** type the code into the terminal. Use the VS Code Explorer to create each file, paste the code, and then save.
+1. In the **Explorer**, select **New File (1)**, ensure **rag\custom-rag-app (2)** is selected, enter **assert_target.py (3)**, and then press **Enter**.
 
-1. In **Visual Studio Code**, in the **Explorer** pane, right-click the **rag/custom-rag-app (1)** folder and then select **New File (2)**.
-
-    ![To be captured](../media/assert-vscode-new-file.png)
-
-1. Name the file **assert_target.py (1)** and press **Enter (2)**.
-
-    ![To be captured](../media/assert-target-filename.png)
+    ![](../media/cust-rag-jul-ex3-g8.png)
 
 1. The new file opens in the editor. Paste the following code into the editor, and then press **Ctrl+S** to save the file. This wraps the existing RAG app as a callable target that ASSERT can evaluate.
 
@@ -101,15 +100,11 @@ In this task, you will describe the behaviors your assistant must follow in a na
        return result["message"].content
    ```
 
-    ![To be captured](../media/assert-target-py-saved.png)
+    ![To be captured](../media/cust-rag-jul-ex3-g9.png)
 
-1. In the **Explorer** pane, right-click the **rag/custom-rag-app (1)** folder again and then select **New File (2)**.
+1. Ensure **rag\custom-rag-app (1)** is selected, select **New File (2)**, enter **eval_config.yaml (3)**, and then press **Enter**.
 
-    ![To be captured](../media/assert-vscode-new-file.png)
-
-1. Name the file **eval_config.yaml (1)** and press **Enter (2)**.
-
-    ![To be captured](../media/assert-config-filename.png)
+    ![](../media/cust-rag-jul-ex3-g10.png)
 
 1. Paste the following configuration into the editor, and then press **Ctrl+S** to save the file. The specification describes the grounding, citation, clarification, and safety behaviors you expect from the assistant.
 
@@ -178,9 +173,6 @@ In this task, you will describe the behaviors your assistant must follow in a na
          name: azure/gpt-5-mini
    ```
 
-   > [!NOTE]
-   > The `callable: assert_target:respond` field tells ASSERT to call the `respond` function in `assert_target.py`. The `suite` and `run` values identify this evaluation run in the artifacts folder.
-
 ## Task 3: Run ASSERT and Interpret the Results
 
 In this task, you will run ASSERT against your RAG app, review the scored artifacts, and identify the behaviors where the assistant underperforms.
@@ -193,27 +185,11 @@ In this task, you will run ASSERT against your RAG app, review the scored artifa
    assert-ai run --config eval_config.yaml
    ```
 
+   ![](../media/cust-rag-jul-ex3-g12.png)
+
    > **Note:** ASSERT generates test cases from your specification, runs them against the target, and scores each conversation with an LLM judge. Expect this to take several minutes. The pipeline runs four stages in order: **systematize** (behavior taxonomy), **test_set** (test case generation), **inference** (runs your RAG app), and **judge** (scores each response).
 
-   > [!NOTE]
-   > You may see a warning that test cases cover only 3 of 4 behavior categories. This is expected with the small sample sizes used in this lab and does not stop the run. To cover all categories, you can increase `sample_size` to 4 or higher in `eval_config.yaml`, at the cost of a longer run.
-
 1. Review the console summary, which reports pass and fail results across the behaviors and judge dimensions defined in your specification.
-
-   ![To be captured](../media/assert-run-summary.png)
-
-1. Open the **artifacts/results (1)** folder that ASSERT created in the **ASSERT** directory. Review the generated specification, test cases, model outputs, judge scores, and judge rationale stored as JSON and JSONL files.
-
-   ![To be captured](../media/assert-artifacts.png)
-
-1. Open the bundled ASSERT viewer to browse the run and read the judge justifications cited against the captured responses.
-
-   ![To be captured](../media/assert-viewer.png)
-
-   > [!NOTE]
-   > Use the ASSERT CLI reference to confirm the exact command for launching the local viewer for your installed version.
-
-1. Identify the behaviors with the lowest scores. Note where the assistant fails to stay grounded in the retrieved documents or answers a vague request without asking for clarification.
 
 ## Task 4: Apply an Improvement and Re-run ASSERT
 
@@ -238,12 +214,6 @@ In this task, you will apply a prompt improvement and re-run ASSERT to confirm t
    > **Note:** Expect the evaluation to take several minutes to complete.
 
 1. In the ASSERT viewer, pin the previous run as the baseline, and then compare it with the new run.
-
-   ![To be captured](../media/assert-compare-runs.png)
-
-1. Verify that the grounding and clarification behaviors score higher in the new run than in the baseline run.
-
-   > **Note:** The scores may not exactly match the values shown in the screenshot. Judge scores can vary depending on the generated test cases and execution environment. Minor differences in results are expected.
 
 You have successfully evaluated and improved the RAG app with ASSERT.
 
