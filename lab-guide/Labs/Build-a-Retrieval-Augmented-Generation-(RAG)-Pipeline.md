@@ -150,7 +150,7 @@ In this task, you will generate responses using augmented knowledge by leveragin
    
 ## Task 4: Create a ContosoAgent
 
-In this task, you will create a prompt agent named **ContosoAgent** in the Microsoft Foundry portal. This agent uses your deployed **gpt-5-mini** model and will be used to verify telemetry in the next task.
+In this task, you will create a prompt agent named **ContosoAgent** in the Microsoft Foundry portal using your deployed **gpt-5-mini** model. You will then use the agent's **Traces** tab to connect an **Application Insights** resource to your project — this is what enables project-wide tracing, which the script in the next task writes to. (The script itself does not call ContosoAgent; the agent is only the convenient place to wire up Application Insights.)
 
 1. Navigate back to the **Microsoft Foundry** portal. Ensure the **New Foundry** toggle is on.
 
@@ -207,23 +207,26 @@ You have successfully created the ContosoAgent.
 
 ### View traces in the Foundry portal
 
-1. Navigate back to the **Microsoft Foundry** portal. From the left navigation pane, select **Agents**, and then select the **Traces** tab.
+> [!IMPORTANT]
+> The script uses **direct inference** (`project.inference.get_chat_completions_client()`), not the ContosoAgent. Its traces therefore appear in the **project-level Observability → Traces** view, **not** under **Agents → Traces**. The agent's own **Traces** tab stays empty until you chat with that agent, so don't look for your script's traces there.
+
+1. Navigate back to the **Microsoft Foundry** portal. From the left navigation pane, select **Observability (1)**, and then select the **Traces (2)** tab. The page is titled **"Use tracing to view performance and debug your app"**.
 
     ![To be captured](../media/foundry-traces-view.png)
 
-1. Verify that a new trace entry appears in the list. Traces may take **5–10 minutes** to appear.
+1. Verify that a new **`chat_with_products`** entry appears in the list, showing the **Input** (your question) and **Output** (the grounded answer). Traces may take **2–5 minutes** to appear.
 
-    > **Note:** If no traces appear, wait a few minutes and then select **Refresh**.
+    > **Note:** If no traces appear, confirm the date range at the top right covers today, then select **Refresh**. It may take a few minutes for the first trace to arrive.
 
-1. Select the trace entry to step through each span, view latency, prompt content, and retrieval operations.
+1. Select the **`chat_with_products`** entry to open the trace and step through each span — you can view latency, the prompt content, and the retrieval (search) operations in the waterfall.
 
     ![To be captured](../media/foundry-trace-detail.png)
 
-1. Select **Filter (1)**, then select **+ Add filter (2)**, set the filter to **Success (3)** → **Equal to (4)** → **True (5)**, and then select **Apply (6)**.
+1. Select **Filter (1)**, then select **+ Add filter (2)**, set the filter to **Status (3)** → **Equal to (4)** → **True (5)**, and then select **Apply (6)**.
 
     ![](../media/L2T4S9-2111.png)
 
-1. Verify that only traces with **Success = True** are displayed.
+1. Verify that only successful traces are displayed.
 
     ![](../media/af57.png)
 
@@ -234,8 +237,8 @@ In this exercise, you built a smart chatbot that doesn’t guess answers.
 - First, you uploaded product information from `products.csv` into a searchable system using `create_search_index.py`.
 - Then, when a user asks a question (like “I need a tent for 4 people”), your app uses `get_product_documents.py` to search and find the best matching products.
 - After that, `chat_with_products.py` takes those matching products and uses AI to generate a proper recommendation based on real data.
-- Then, you created a **ContosoAgent** in the Microsoft Foundry portal using the deployed **gpt-5-mini** model and tested it in the Playground.
-- Finally, you connected Application Insights to your project, ran the chat app with the `--enable-telemetry` flag, and verified traces in the **Foundry portal** under **Agents → Traces**.
+- Then, you created a **ContosoAgent** in the Microsoft Foundry portal using the deployed **gpt-5-mini** model and, from its **Traces** tab, connected an **Application Insights** resource to your project.
+- Finally, you ran the chat app with the `--enable-telemetry` flag and verified traces in the **Foundry portal** under **Observability → Traces**.
 
 ### You have successfully completed the exercise. Click **Next >>** to continue to the next exercise.
 
