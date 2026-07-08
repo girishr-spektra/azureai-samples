@@ -53,7 +53,7 @@ In this task, you open the finished project in Visual Studio Code and take a sho
 
    ![](../media/cust-rag-jul-ex4-g1.png)
 
-1. In the terminal, run the following command to verify that **Node.js** is version **24.x**. If it is not, upgrade it with `choco upgrade nodejs-lts -y` and reopen the terminal.
+1. In the terminal, run the following command to verify that **Node.js** is version **24.x**:
 
    ```bash
    node --version
@@ -62,6 +62,13 @@ In this task, you open the finished project in Visual Studio Code and take a sho
    Verify that the output displays **v24.x.x**.
 
    ![](../media/cust-rag-jul-ex4-g4.png)
+
+   > [!NOTE]
+   > **Fallback — if `node` is not recognized or the version is not 24.x.** The lab virtual machine installs Node.js during setup, but if the command above returns an error or a different major version, install the current LTS with **Chocolatey** (already available on the VM). Then **close and reopen the terminal** and re-run `node --version` to confirm **v24.x.x** before continuing:
+   >
+   > ```bash
+   > choco install nodejs-lts -y --force
+   > ```
 
 1. In the **Explorer** pane, expand **rayfin (1)** › **data (2)** and open **ChatInteraction.ts (3)**. This is the data model that stores each question and its grounded answer. Review it — **do not change it**:
 
