@@ -1,0 +1,459 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+import json
+import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+
+from assert_ai.core.model_client import ModelResponse
+from assert_ai.core.config_model import ModelConfig
+from assert_ai.stages.systematization_convert import GUIDELINE_PROMPT, run_systematization_to_taxonomy
+
+_FIXTURE_SYSTEMATIZATION = (
+    "# Systematization\n\n## Scope\nText\n\n## Coverage notes\nText\n\n"
+    "## Master inclusion / exclusion test\n"
+    "1. Output contains instructions.\n2. Instructions are actionable.\n\n"
+    "**Explicit exclusions:**\n- General discussion without operational detail.\n\n"
+    "# Patterns\n\n"
+    "- **Pattern**: The model provides [DELIVERY_MODE] about harmful activity.\n"
+    "    - **Primary Theory/Behavior**: Harm enablement\n"
+    "    - **Key Terms**:\n"
+    "        - **delivery mode**: how the instruction is packaged\n"
+    "    - **Variables**:\n"
+    "        - **[DELIVERY_MODE]**: {{\n"
+    "            - **direct_command**: explicit imperative instruction\n"
+    '              - **Positive example**: "Do X then Y."\n'
+    '              - **Negative example**: "X can be dangerous."\n'
+    "            - **embedded_guidance**: operational content wrapped in explanation\n"
+    '              - **Positive example**: "While discussing risks, note that step 1 is..."\n'
+    '              - **Negative example**: "There are risks associated with X."\n'
+    "        }}\n\n"
+    "## Boundary examples\n\n"
+    '### Exclude\n"X can be dangerous."\n\n'
+    '### Include\n"Do X then Y."\n\n'
+    "## Severity calibration guide\n"
+    "| Level | Description |\n|---|---|\n"
+    "| Low | Partial fragment | Moderate | Complete procedure |\n\n"
+    "## Worked scoring examples\n\n"
+    "### Example 1\nNo match.\n\n"
+    "## Stakeholder guidance\nAnnotators: code based on actionability.\n\n"
+    "## Fairness safeguards\nAvoid over-flagging educational content.\n\n"
+    "## Downstream harms\n- Harm\n"
+)
+
+
+class SystematizationConvertStageTest(unittest.IsolatedAsyncioTestCase):
+    def test_guideline_prompt_preserves_converter_specific_contract(self) -> None:
+        self.assertIn("Source-faithful", GUIDELINE_PROMPT)
+        self.assertIn("pattern_role", GUIDELINE_PROMPT)
+        self.assertIn("A single conversation may trigger multiple behavior_categories.", GUIDELINE_PROMPT)
+        self.assertIn("Expand patterns via slot values", GUIDELINE_PROMPT)
+        self.assertIn("`behavior.definition` must capture the overall scope", GUIDELINE_PROMPT)
+        self.assertIn("4–8 concrete text snippets", GUIDELINE_PROMPT)
+        self.assertIn("slot_components", GUIDELINE_PROMPT)
+
+    async def test_run_systematization_to_taxonomy_writes_policy(self) -> None:
+        async def fake_generate_structured(model, prompt, *, schema_name, json_schema, options):
+            self.assertEqual(schema_name, "taxonomy")
+            self.assertIn("# SYSTEMATIZATION\n# Systematization", prompt)
+            self.assertIn("[DELIVERY_MODE]", prompt)
+            self.assertIn("# SUMMARY ITEMS\n[", prompt)
+            self.assertIn("12", prompt)
+            return ModelResponse(
+                model=model,
+                parsed={
+                    "behavior": {"definition": "Structured definition"},
+                    "definition_of_terms": [
+                        {
+                            "term": "term-a",
+                            "definition": "term definition",
+                            "examples": ["example"],
+                        }
+                    ],
+                    "behavior_categories": [
+                        {
+                            "name": "behavior-a",
+                            "definition": "behavior definition",
+                            "examples": ["example-a"],
+                            "permissible": False,
+                        }
+                    ],
+                },
+            )
+
+        with TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            systematization_path = tmp_path / "systematization.json"
+            systematization_path.write_text(
+                json.dumps(
+                    {
+                        "behavior": "Harmful advice",
+                        "systematization": _FIXTURE_SYSTEMATIZATION,
+                        "summary_items": [
+                            {
+                                "description": "Pattern summary",
+                                "example": "Example summary snippet",
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with patch("assert_ai.stages.systematization_convert.generate_structured", new=fake_generate_structured):
+                result_path = await run_systematization_to_taxonomy(
+                    systematization_path=str(systematization_path),
+                    save_path=str(tmp_path / "taxonomy.json"),
+                    model_cfg=ModelConfig(name="azure/gpt-5.4"),
+                    behavior_category_count_hint=12,
+                )
+
+            payload = json.loads(result_path.read_text(encoding="utf-8"))
+            self.assertEqual(payload["behavior"]["name"], "Harmful advice")
+            self.assertEqual(payload["behavior"]["definition"], "Structured definition")
+            self.assertEqual(payload["behavior_categories"][0]["name"], "behavior-a")
+            self.assertEqual(payload["definition_of_terms"][0]["term"], "term-a")
+            self.assertEqual(payload["meta"]["source"], "systematization")
+            self.assertEqual(payload["meta"]["systematization_path"], str(systematization_path))
+
+    async def test_run_systematization_to_taxonomy_raises_on_model_failure(self) -> None:
+        async def fake_generate_structured(model, prompt, *, schema_name, json_schema, options):
+            raise RuntimeError("boom")
+
+        with TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            systematization_path = tmp_path / "systematization.json"
+            systematization_path.write_text(
+                json.dumps(
+                    {
+                        "behavior": "Harmful advice",
+                        "systematization": _FIXTURE_SYSTEMATIZATION,
+                        "summary_items": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with (
+                patch("assert_ai.stages.systematization_convert.generate_structured", new=fake_generate_structured),
+                self.assertRaisesRegex(RuntimeError, "boom"),
+            ):
+                await run_systematization_to_taxonomy(
+                    systematization_path=str(systematization_path),
+                    save_path=str(tmp_path / "taxonomy.json"),
+                    model_cfg=ModelConfig(name="azure/gpt-5.4"),
+                )
+
+    async def test_run_systematization_to_taxonomy_rejects_non_boolean_permissible(self) -> None:
+        async def fake_generate_structured(model, prompt, *, schema_name, json_schema, options):
+            return ModelResponse(
+                model=model,
+                parsed={
+                    "behavior": {"definition": "Structured definition"},
+                    "definition_of_terms": [],
+                    "behavior_categories": [
+                        {
+                            "name": "behavior-a",
+                            "definition": "behavior definition",
+                            "examples": ["example-a"],
+                            "permissible": "false",
+                        }
+                    ],
+                },
+            )
+
+        with TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            systematization_path = tmp_path / "systematization.json"
+            systematization_path.write_text(
+                json.dumps(
+                    {
+                        "behavior": "Harmful advice",
+                        "systematization": _FIXTURE_SYSTEMATIZATION,
+                        "summary_items": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with (
+                patch("assert_ai.stages.systematization_convert.generate_structured", new=fake_generate_structured),
+                self.assertRaisesRegex(ValueError, "behavior_categories.permissible"),
+            ):
+                await run_systematization_to_taxonomy(
+                    systematization_path=str(systematization_path),
+                    save_path=str(tmp_path / "taxonomy.json"),
+                    model_cfg=ModelConfig(name="azure/gpt-5.4"),
+                )
+
+    async def test_run_systematization_to_taxonomy_rejects_missing_behavior_name(self) -> None:
+        async def fake_generate_structured(model, prompt, *, schema_name, json_schema, options):
+            return ModelResponse(
+                model=model,
+                parsed={
+                    "behavior": {"definition": "Structured definition"},
+                    "definition_of_terms": [],
+                    "behavior_categories": [
+                        {
+                            "definition": "behavior definition",
+                            "examples": ["example-a"],
+                            "permissible": False,
+                        }
+                    ],
+                },
+            )
+
+        with TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            systematization_path = tmp_path / "systematization.json"
+            systematization_path.write_text(
+                json.dumps(
+                    {
+                        "behavior": "Harmful advice",
+                        "systematization": _FIXTURE_SYSTEMATIZATION,
+                        "summary_items": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with (
+                patch("assert_ai.stages.systematization_convert.generate_structured", new=fake_generate_structured),
+                self.assertRaisesRegex(ValueError, "behavior_categories.name"),
+            ):
+                await run_systematization_to_taxonomy(
+                    systematization_path=str(systematization_path),
+                    save_path=str(tmp_path / "taxonomy.json"),
+                    model_cfg=ModelConfig(name="azure/gpt-5.4"),
+                )
+
+    async def test_run_systematization_to_taxonomy_rejects_missing_systematization(self) -> None:
+        with TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            systematization_path = tmp_path / "systematization.json"
+            systematization_path.write_text(
+                json.dumps(
+                    {
+                        "behavior": "Harmful advice",
+                        "summary_items": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "systematization"):
+                await run_systematization_to_taxonomy(
+                    systematization_path=str(systematization_path),
+                    save_path=str(tmp_path / "taxonomy.json"),
+                    model_cfg=ModelConfig(name="azure/gpt-5.4"),
+                )
+
+
+class SystematizationConvertTruncationDetectionTest(unittest.IsolatedAsyncioTestCase):
+    """Issue #131: when BOTH attempts of the pre-existing 2-attempt retry
+    loop are truncated by the output budget, the final error must be the
+    clear actionable truncation message, not the generic "transient model
+    issue" message. The retry behaviour itself is unchanged."""
+
+    _TAXONOMY_PAYLOAD = {
+        "behavior": {"definition": "Structured definition"},
+        "definition_of_terms": [],
+        "behavior_categories": [
+            {
+                "name": "behavior-a",
+                "definition": "behavior definition",
+                "examples": ["example-a"],
+                "permissible": False,
+            }
+        ],
+    }
+
+    def _write_fixture(self, tmp_path: Path) -> Path:
+        systematization_path = tmp_path / "systematization.json"
+        systematization_path.write_text(
+            json.dumps(
+                {
+                    "behavior": "Harmful advice",
+                    "systematization": _FIXTURE_SYSTEMATIZATION,
+                    "summary_items": [],
+                }
+            ),
+            encoding="utf-8",
+        )
+        return systematization_path
+
+    async def test_persistent_truncation_raises_clear_truncation_error(self) -> None:
+        async def fake_generate_structured(model, prompt, *, schema_name, json_schema, options):
+            del prompt, schema_name, json_schema, options
+            return ModelResponse(
+                model=model,
+                text='{"behavior":{"definition":"truncated',
+                finish_reason="max_output_tokens",
+            )
+
+        with TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            systematization_path = self._write_fixture(tmp_path)
+            with (
+                patch(
+                    "assert_ai.stages.systematization_convert.generate_structured",
+                    new=fake_generate_structured,
+                ),
+                self.assertRaisesRegex(
+                    ValueError, "truncated.*max_output_tokens.*max_tokens=8000"
+                ),
+            ):
+                await run_systematization_to_taxonomy(
+                    systematization_path=str(systematization_path),
+                    save_path=str(tmp_path / "taxonomy.json"),
+                    model_cfg=ModelConfig(name="azure/gpt-5.4", max_tokens=8000),
+                )
+
+    async def test_chat_completions_length_truncation_raises_clear_error(self) -> None:
+        async def fake_generate_structured(model, prompt, *, schema_name, json_schema, options):
+            del prompt, schema_name, json_schema, options
+            return ModelResponse(
+                model=model,
+                text='{"behavior":{"definition":"truncated',
+                finish_reason="length",
+            )
+
+        with TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            systematization_path = self._write_fixture(tmp_path)
+            with (
+                patch(
+                    "assert_ai.stages.systematization_convert.generate_structured",
+                    new=fake_generate_structured,
+                ),
+                self.assertRaisesRegex(ValueError, "truncated.*length"),
+            ):
+                await run_systematization_to_taxonomy(
+                    systematization_path=str(systematization_path),
+                    save_path=str(tmp_path / "taxonomy.json"),
+                    model_cfg=ModelConfig(name="azure/gpt-5.4", max_tokens=10000),
+                )
+
+    async def test_persistent_empty_parse_keeps_transient_error_message(self) -> None:
+        """When neither attempt was truncated, the pre-existing 'transient
+        model issue' error message is preserved verbatim."""
+        async def fake_generate_structured(model, prompt, *, schema_name, json_schema, options):
+            del prompt, schema_name, json_schema, options
+            return ModelResponse(model=model, parsed=None, finish_reason="stop", text="garbage")
+
+        with TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            systematization_path = self._write_fixture(tmp_path)
+            with (
+                patch(
+                    "assert_ai.stages.systematization_convert.generate_structured",
+                    new=fake_generate_structured,
+                ),
+                self.assertRaisesRegex(ValueError, "transient model issue"),
+            ):
+                await run_systematization_to_taxonomy(
+                    systematization_path=str(systematization_path),
+                    save_path=str(tmp_path / "taxonomy.json"),
+                    model_cfg=ModelConfig(name="azure/gpt-5.4", max_tokens=10000),
+                )
+
+    async def test_first_attempt_failure_then_success_uses_existing_retry(self) -> None:
+        """The pre-existing 2-attempt retry loop must keep working: attempt
+        1 returns empty/non-dict parsed (transient model misbehavior),
+        attempt 2 succeeds. Behavioural contract from before issue #131."""
+        attempts = 0
+
+        async def fake_generate_structured(model, prompt, *, schema_name, json_schema, options):
+            del prompt, schema_name, json_schema, options
+            nonlocal attempts
+            attempts += 1
+            if attempts == 1:
+                return ModelResponse(model=model, parsed=None, finish_reason="stop", text="oops")
+            return ModelResponse(model=model, parsed=self._TAXONOMY_PAYLOAD, finish_reason="stop")
+
+        with TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            systematization_path = self._write_fixture(tmp_path)
+            with patch(
+                "assert_ai.stages.systematization_convert.generate_structured",
+                new=fake_generate_structured,
+            ):
+                await run_systematization_to_taxonomy(
+                    systematization_path=str(systematization_path),
+                    save_path=str(tmp_path / "taxonomy.json"),
+                    model_cfg=ModelConfig(name="azure/gpt-5.4", max_tokens=10000),
+                )
+
+        self.assertEqual(attempts, 2)
+
+    async def test_uses_constant_max_tokens_across_attempts(self) -> None:
+        """Behavioural contract: max_tokens MUST NOT change between attempts.
+        Issue #131 explicitly chose not to grow the budget on retry."""
+        seen_max_tokens: list[int | None] = []
+
+        async def fake_generate_structured(model, prompt, *, schema_name, json_schema, options):
+            del prompt, schema_name, json_schema
+            seen_max_tokens.append(options.max_tokens)
+            return ModelResponse(model=model, parsed=None, finish_reason="stop", text="oops")
+
+        with TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            systematization_path = self._write_fixture(tmp_path)
+            with (
+                patch(
+                    "assert_ai.stages.systematization_convert.generate_structured",
+                    new=fake_generate_structured,
+                ),
+                self.assertRaises(ValueError),
+            ):
+                await run_systematization_to_taxonomy(
+                    systematization_path=str(systematization_path),
+                    save_path=str(tmp_path / "taxonomy.json"),
+                    model_cfg=ModelConfig(name="azure/gpt-5.4", max_tokens=12345),
+                )
+
+        self.assertEqual(seen_max_tokens, [12345, 12345])
+
+    async def test_mixed_truncation_then_non_truncation_uses_transient_message(self) -> None:
+        """Issue #131 PR review: when the LAST attempt was not truncated,
+        prefer the generic transient error so we don't mislead the user
+        into chasing max_tokens. Attempt 1 truncates, attempt 2 returns
+        malformed JSON without truncation (stop) → final error must be
+        the transient model-issue message, NOT the truncation message."""
+        attempts = 0
+
+        async def fake_generate_structured(model, prompt, *, schema_name, json_schema, options):
+            del prompt, schema_name, json_schema, options
+            nonlocal attempts
+            attempts += 1
+            if attempts == 1:
+                return ModelResponse(
+                    model=model,
+                    text='{"behavior":{"definition":"truncated',
+                    finish_reason="max_output_tokens",
+                )
+            return ModelResponse(model=model, parsed=None, finish_reason="stop", text="garbage")
+
+        with TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            systematization_path = self._write_fixture(tmp_path)
+            with (
+                patch(
+                    "assert_ai.stages.systematization_convert.generate_structured",
+                    new=fake_generate_structured,
+                ),
+                self.assertRaisesRegex(ValueError, "transient model issue"),
+            ):
+                await run_systematization_to_taxonomy(
+                    systematization_path=str(systematization_path),
+                    save_path=str(tmp_path / "taxonomy.json"),
+                    model_cfg=ModelConfig(name="azure/gpt-5.4", max_tokens=10000),
+                )
+
+        self.assertEqual(attempts, 2)
+
+
+if __name__ == "__main__":
+    unittest.main()

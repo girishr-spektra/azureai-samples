@@ -1,0 +1,8 @@
+azure-ai-projects==1.0.0b11
+azure-ai-inference[prompts]==1.0.0b9
+azure-identity
+azure-search-documents
+pandas
+python-dotenv
+opentelemetry-api
+azure-monitor-opentelemetry
